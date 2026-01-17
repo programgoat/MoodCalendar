@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>Today Mood Log</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>気分カレンダー＋気分ログ統合版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {
       --bg: #0f172a;
@@ -40,7 +40,7 @@
 
     .app {
       width: 100%;
-      max-width: 960px;
+      max-width: 1120px;
       background: linear-gradient(145deg, #020617 0%, #020617 55%, #020617 100%);
       border-radius: 26px;
       border: 1px solid rgba(148, 163, 184, 0.18);
@@ -65,11 +65,11 @@
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
       gap: 18px;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
       .app-inner {
         grid-template-columns: minmax(0, 1fr);
       }
@@ -134,6 +134,8 @@
       gap: 8px;
       font-size: 11px;
       color: var(--text-sub);
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .dot {
@@ -222,10 +224,307 @@
       background: var(--accent);
     }
 
+    /* カレンダー */
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .calendar-header button {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 11px;
+      transition: background var(--transition-fast), border-color var(--transition-fast),
+        color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .calendar-header button:hover {
+      border-color: var(--accent);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.98);
+      transform: translateY(-1px);
+    }
+
+    .calendar-header strong {
+      font-size: 14px;
+    }
+
+    .weekday-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 4px;
+      font-size: 11px;
+      color: var(--text-sub);
+      text-align: center;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .day {
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 8px 6px;
+      text-align: right;
+      cursor: pointer;
+      transition: 0.18s;
+      min-height: 52px;
+      position: relative;
+      font-size: 11px;
+      color: var(--text-sub);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .day:hover {
+      border-color: var(--accent);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .day-number {
+      font-size: 12px;
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .day-mood-label {
+      font-size: 10px;
+      opacity: 0.9;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .day-today {
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7);
+    }
+
+    /* 気分色 */
+    .mood-bad { background: linear-gradient(145deg, #7f1d1d, #b91c1c) !important; }
+    .mood-meh { background: linear-gradient(145deg, #111827, #374151) !important; }
+    .mood-good { background: linear-gradient(145deg, #14532d, #16a34a) !important; }
+    .mood-great { background: linear-gradient(145deg, #78350f, #f59e0b) !important; }
+
+    .mood-bad .day-number,
+    .mood-meh .day-number,
+    .mood-good .day-number,
+    .mood-great .day-number {
+      color: #f9fafb;
+    }
+
+    .mood-bad .day-mood-label,
+    .mood-meh .day-mood-label,
+    .mood-good .day-mood-label,
+    .mood-great .day-mood-label {
+      color: #e5e7eb;
+    }
+
+    /* 右側：詳細＆グラフ */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      flex: 1;
+      min-width: 0;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 8px 9px;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      color: var(--text-sub);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .stat-value span {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .stat-pill {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(22, 163, 74, 0.12);
+      color: #4ade80;
+      font-size: 10px;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    .stat-pill.bad {
+      background: rgba(248, 113, 113, 0.12);
+      color: #fca5a5;
+      border-color: rgba(248, 113, 113, 0.5);
+    }
+
+    .selected-day-info {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    .selected-day-info strong {
+      color: #e5e7eb;
+    }
+
+    .note-box {
+      margin-top: 6px;
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(148, 163, 184, 0.5);
+      padding: 7px 8px;
+      font-size: 11px;
+      color: var(--text-sub);
+      background: rgba(15, 23, 42, 0.85);
+      min-height: 40px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note-empty {
+      opacity: 0.8;
+    }
+
+    /* グラフ（簡易） */
+    .graph {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 70px;
+      margin-top: 4px;
+    }
+
+    .graph-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: rgba(30, 64, 175, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .graph-bar-inner {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, #38bdf8, #0ea5e9);
+    }
+
+    .graph-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+      font-size: 9px;
+      color: var(--text-sub);
+    }
+
+    /* モーダル（気分入力UI） */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease-out;
+    }
+
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.12), transparent 55%),
+        rgba(15, 23, 42, 0.98);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.95);
+      padding: 14px 14px 12px;
+      position: relative;
+      transform: translateY(8px);
+      transition: transform 0.18s ease-out;
+    }
+
+    .modal-backdrop.show .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .modal-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .modal-subtitle {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 16px;
+    }
+
     .mood-scale {
       display: flex;
       gap: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .mood-option {
@@ -288,7 +587,7 @@
 
     textarea {
       width: 100%;
-      min-height: 80px;
+      min-height: 70px;
       resize: vertical;
       border-radius: var(--radius-md);
       border: 1px solid rgba(148, 163, 184, 0.5);
@@ -314,50 +613,13 @@
       transform: translateY(-1px);
     }
 
-    .actions {
+    .modal-actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 10px;
-      gap: 10px;
+      margin-top: 8px;
+      gap: 8px;
       flex-wrap: wrap;
-    }
-
-    .actions-left {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      font-size: 11px;
-      color: var(--text-sub);
-    }
-
-    .chip {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px dashed rgba(148, 163, 184, 0.5);
-      background: rgba(15, 23, 42, 0.8);
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      transition: border-color var(--transition-fast), background var(--transition-fast),
-        transform var(--transition-fast);
-    }
-
-    .chip:hover {
-      border-style: solid;
-      border-color: var(--accent);
-      background: rgba(15, 23, 42, 0.95);
-      transform: translateY(-1px);
-    }
-
-    .chip span {
-      font-size: 12px;
-    }
-
-    .chip small {
-      font-size: 10px;
-      color: var(--text-sub);
     }
 
     .btn-primary {
@@ -422,133 +684,26 @@
       font-size: 13px;
     }
 
-    .right-column {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .stats-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .stat-card {
-      flex: 1;
-      min-width: 0;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.9);
-      padding: 8px 9px;
-      font-size: 11px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .stat-label {
-      color: var(--text-sub);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .stat-value {
-      font-size: 16px;
-      font-weight: 600;
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-    }
-
-    .stat-value span {
-      font-size: 11px;
-      color: var(--text-sub);
-    }
-
-    .stat-pill {
-      padding: 2px 6px;
+    .chip {
+      padding: 4px 8px;
       border-radius: 999px;
-      background: rgba(22, 163, 74, 0.12);
-      color: #4ade80;
-      font-size: 10px;
-      border: 1px solid rgba(34, 197, 94, 0.4);
-    }
-
-    .stat-pill.bad {
-      background: rgba(248, 113, 113, 0.12);
-      color: #fca5a5;
-      border-color: rgba(248, 113, 113, 0.5);
-    }
-
-    .history {
-      margin-top: 4px;
-      border-radius: var(--radius-md);
       border: 1px dashed rgba(148, 163, 184, 0.5);
-      padding: 7px 8px;
-      font-size: 11px;
-      color: var(--text-sub);
-      max-height: 150px;
-      overflow: auto;
-      background: rgba(15, 23, 42, 0.85);
-    }
-
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 4px 0;
-      border-bottom: 1px dashed rgba(55, 65, 81, 0.7);
-    }
-
-    .history-item:last-child {
-      border-bottom: none;
-    }
-
-    .history-main {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .history-mood {
-      font-size: 11px;
-      color: #e5e7eb;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .history-note {
-      font-size: 11px;
-      color: var(--text-sub);
-      word-break: break-word;
-    }
-
-    .history-meta {
-      font-size: 10px;
-      color: rgba(148, 163, 184, 0.8);
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    .tag {
+      background: rgba(15, 23, 42, 0.8);
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.5);
+      gap: 5px;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast),
+        transform var(--transition-fast);
       font-size: 10px;
       color: var(--text-sub);
     }
 
-    .tag span {
-      font-size: 11px;
+    .chip:hover {
+      border-style: solid;
+      border-color: var(--accent);
+      background: rgba(15, 23, 42, 0.95);
+      transform: translateY(-1px);
     }
 
     .footer {
@@ -561,6 +716,7 @@
       gap: 10px;
       font-size: 10px;
       color: var(--text-sub);
+      flex-wrap: wrap;
     }
 
     .footer-left {
@@ -598,29 +754,6 @@
       font-weight: 500;
     }
 
-    .link {
-      color: var(--accent);
-      text-decoration: none;
-      border-bottom: 1px dashed rgba(56, 189, 248, 0.6);
-      padding-bottom: 1px;
-    }
-
-    .link:hover {
-      border-bottom-style: solid;
-    }
-
-    .empty-state {
-      font-size: 11px;
-      color: rgba(148, 163, 184, 0.9);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .empty-state span {
-      font-size: 13px;
-    }
-
     .pill-soft {
       padding: 2px 6px;
       border-radius: 999px;
@@ -654,24 +787,25 @@
 <body>
   <div class="app">
     <div class="app-inner">
+      <!-- 左：カレンダー -->
       <div>
         <header class="header">
           <div class="title-block">
             <div class="logo">M</div>
             <div>
               <div class="title-text-main">
-                Today Mood Log
-                <span class="title-pill">beta</span>
+                Mood Calendar
+                <span class="title-pill">v2</span>
               </div>
               <div class="title-text-sub">
-                1日の気分を、30秒でメモしておく場所。
+                カレンダーで、1日の気分とひとことメモを残す。
               </div>
             </div>
           </div>
           <div class="header-right">
             <div class="dot"></div>
             <div class="pill">
-              <strong id="today-label"></strong> の記録
+              <strong id="today-label"></strong> の今日
             </div>
           </div>
         </header>
@@ -679,73 +813,34 @@
         <section class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Mood check-in</div>
+              <div class="card-title">Mood calendar</div>
               <div class="card-subtitle">
-                今日の「ざっくりした気分」に一番近いものを選んでください。
+                日付をクリックして、その日の気分とメモを登録できます。
               </div>
             </div>
             <div class="badge">
               <span class="badge-dot"></span>
-              auto-save enabled
+              local only / auto-save
             </div>
           </div>
 
-          <div class="mood-scale" id="mood-scale">
-            <button class="mood-option" data-mood="bad">
-              <span>😣</span>
-              <strong>しんどい</strong>
-            </button>
-            <button class="mood-option" data-mood="meh">
-              <span>😐</span>
-              <strong>ふつう</strong>
-            </button>
-            <button class="mood-option" data-mood="good">
-              <span>🙂</span>
-              <strong>わりと良い</strong>
-            </button>
-            <button class="mood-option" data-mood="great">
-              <span>😄</span>
-              <strong>最高</strong>
-            </button>
+          <div class="calendar-header">
+            <button id="prev-month">← 前の月</button>
+            <strong id="month-label"></strong>
+            <button id="next-month">次の月 →</button>
           </div>
 
-          <div class="textarea-label">
-            <span>ひとことメモ（あとで読み返したくなるくらい、ざっくりでOK）</span>
-            <span id="char-count">0 / 120</span>
+          <div class="weekday-row">
+            <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
           </div>
-          <textarea
-            id="note"
-            maxlength="120"
-            placeholder="例）朝はだるかったけど、ランチで少し気分が上がった。夜はゆっくりできそう。"
-          ></textarea>
 
-          <div class="actions">
-            <div class="actions-left">
-              <button class="chip" type="button" data-template="小さな良かったことを書いてみる？">
-                <span>✨</span>
-                <small>「良かったこと」をヒントにする</small>
-              </button>
-              <button class="chip" type="button" data-template="しんどさの原因を一言で書いてみる？">
-                <span>🧩</span>
-                <small>「しんどさの正体」を探る</small>
-              </button>
-            </div>
-            <div style="display:flex; gap:6px; align-items:center;">
-              <button class="btn-secondary" type="button" id="clear-btn">
-                <span>🧹</span>
-                クリア
-              </button>
-              <button class="btn-primary" type="button" id="save-btn">
-                <span>➤</span>
-                Save today
-              </button>
-            </div>
-          </div>
+          <div class="calendar" id="calendar"></div>
         </section>
       </div>
 
+      <!-- 右：詳細・統計 -->
       <div class="right-column">
-        <section class="stats-row">
+        <section class="stat-row">
           <div class="stat-card">
             <div class="stat-label">
               <span>今月の平均ムード</span>
@@ -756,7 +851,7 @@
               <span>/ 4</span>
             </div>
             <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
-              ざっくりとした「今月の自分の調子」の目安です。
+              今月登録された日だけを対象にした、ざっくり平均値です。
             </div>
           </div>
           <div class="stat-card">
@@ -769,7 +864,7 @@
               <span>entries</span>
             </div>
             <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
-              「毎日つける」より「思い出したときにつける」で十分です。
+              「毎日」じゃなくて、「思い出したときに」つけるくらいで十分です。
             </div>
           </div>
         </section>
@@ -777,23 +872,33 @@
         <section class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Recent notes</div>
+              <div class="card-title">Selected day</div>
               <div class="card-subtitle">
-                直近のメモを3件まで表示します。あとで読み返すと、意外なパターンが見えてきます。
+                カレンダーで選択した日の気分とメモを表示します。
               </div>
-            </div>
-            <div class="tag">
-              <span>📅</span>
-              last 7 days
             </div>
           </div>
 
-          <div class="history" id="history">
-            <div class="empty-state">
-              <span>📝</span>
-              まだ記録がありません。今日の気分を、ひとことだけ残してみませんか？
+          <div class="selected-day-info" id="selected-day-info">
+            まだ日付が選択されていません。カレンダーのどこかをクリックしてみてください。
+          </div>
+          <div class="note-box" id="selected-note-box">
+            <span class="note-empty">メモはまだありません。</span>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Last 7 days mood</div>
+              <div class="card-subtitle">
+                直近7日間のムードを、ざっくり棒グラフで表示します（1〜4のスコア）。
+              </div>
             </div>
           </div>
+
+          <div class="graph" id="graph"></div>
+          <div class="graph-labels" id="graph-labels"></div>
         </section>
 
         <footer class="footer">
@@ -816,29 +921,98 @@
     </div>
   </div>
 
+  <!-- モーダル：気分入力 -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modal-title">気分を記録</div>
+          <div class="modal-subtitle" id="modal-subtitle">
+            その日の「ざっくりした気分」と、ひとことメモを残しておけます。
+          </div>
+        </div>
+        <button class="modal-close" id="modal-close">×</button>
+      </div>
+
+      <div class="mood-scale" id="mood-scale">
+        <button class="mood-option" data-mood="bad">
+          <span>😣</span>
+          <strong>しんどい</strong>
+        </button>
+        <button class="mood-option" data-mood="meh">
+          <span>😐</span>
+          <strong>ふつう</strong>
+        </button>
+        <button class="mood-option" data-mood="good">
+          <span>🙂</span>
+          <strong>わりと良い</strong>
+        </button>
+        <button class="mood-option" data-mood="great">
+          <span>😄</span>
+          <strong>最高</strong>
+        </button>
+      </div>
+
+      <div class="textarea-label">
+        <span>ひとことメモ（あとで読み返したくなるくらい、ざっくりでOK）</span>
+        <span id="char-count">0 / 120</span>
+      </div>
+      <textarea
+        id="note"
+        maxlength="120"
+        placeholder="例）朝はだるかったけど、ランチで少し気分が上がった。夜はゆっくりできそう。"
+      ></textarea>
+
+      <div class="modal-actions">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="chip" type="button" data-template="小さな良かったことを書いてみる？">
+            <span>✨</span>
+            良かったことヒント
+          </button>
+          <button class="chip" type="button" data-template="しんどさの原因を一言で書いてみる？">
+            <span>🧩</span>
+            しんどさの正体
+          </button>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button class="btn-secondary" type="button" id="clear-btn">
+            <span>🧹</span>
+            クリア
+          </button>
+          <button class="btn-primary" type="button" id="save-btn">
+            <span>➤</span>
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    /* ====== 共通：前作と同じデータ構造 ====== */
     const STORAGE_KEY = "today-mood-log-v1";
 
-    const moodScaleEl = document.getElementById("mood-scale");
-    const noteEl = document.getElementById("note");
-    const charCountEl = document.getElementById("char-count");
-    const saveBtn = document.getElementById("save-btn");
-    const clearBtn = document.getElementById("clear-btn");
-    const historyEl = document.getElementById("history");
-    const todayLabelEl = document.getElementById("today-label");
-    const avgScoreEl = document.getElementById("avg-score");
-    const avgPillEl = document.getElementById("avg-pill");
-    const entryCountEl = document.getElementById("entry-count");
-    const streakPillEl = document.getElementById("streak-pill");
-
-    let selectedMood = null;
-
     const moodMap = {
-      bad: { label: "しんどい", emoji: "😣", score: 1 },
-      meh: { label: "ふつう", emoji: "😐", score: 2 },
-      good: { label: "わりと良い", emoji: "🙂", score: 3 },
-      great: { label: "最高", emoji: "😄", score: 4 },
+      bad: { label: "しんどい", emoji: "😣", score: 1, colorClass: "mood-bad" },
+      meh: { label: "ふつう", emoji: "😐", score: 2, colorClass: "mood-meh" },
+      good: { label: "わりと良い", emoji: "🙂", score: 3, colorClass: "mood-good" },
+      great: { label: "最高", emoji: "😄", score: 4, colorClass: "mood-great" },
     };
+
+    function loadEntries() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveEntries(entries) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
 
     function formatDateLabel(date = new Date()) {
       const y = date.getFullYear();
@@ -854,20 +1028,142 @@
       return `${h}:${m}`;
     }
 
-    function loadEntries() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return [];
-        return parsed;
-      } catch {
-        return [];
-      }
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
-    function saveEntries(entries) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    /* ====== カレンダー関連 ====== */
+    const calendarEl = document.getElementById("calendar");
+    const monthLabelEl = document.getElementById("month-label");
+    const todayLabelEl = document.getElementById("today-label");
+
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
+
+    let selectedDate = null; // Dateオブジェクト
+
+    function sameDay(d1, d2) {
+      return d1.getFullYear() === d2.getFullYear() &&
+             d1.getMonth() === d2.getMonth() &&
+             d1.getDate() === d2.getDate();
+    }
+
+    function renderCalendar() {
+      calendarEl.innerHTML = "";
+
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const lastDay = new Date(currentYear, currentMonth + 1, 0);
+      const daysInMonth = lastDay.getDate();
+
+      monthLabelEl.textContent = `${currentYear}年 ${currentMonth + 1}月`;
+
+      const entries = loadEntries();
+
+      // 1日が何曜日か
+      const startWeekday = firstDay.getDay();
+      for (let i = 0; i < startWeekday; i++) {
+        const empty = document.createElement("div");
+        calendarEl.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cellDate = new Date(currentYear, currentMonth, day);
+        const div = document.createElement("div");
+        div.className = "day";
+
+        const num = document.createElement("div");
+        num.className = "day-number";
+        num.textContent = day;
+
+        const label = document.createElement("div");
+        label.className = "day-mood-label";
+
+        const entry = entries
+          .slice()
+          .reverse()
+          .find(e => {
+            const d = new Date(e.createdAt);
+            return sameDay(d, cellDate);
+          });
+
+        if (entry && moodMap[entry.mood]) {
+          const mood = moodMap[entry.mood];
+          div.classList.add(mood.colorClass);
+          label.textContent = `${mood.emoji} ${mood.label}`;
+        } else {
+          label.textContent = "";
+        }
+
+        const today = new Date();
+        if (sameDay(today, cellDate)) {
+          div.classList.add("day-today");
+        }
+
+        div.appendChild(num);
+        div.appendChild(label);
+
+        div.addEventListener("click", () => {
+          selectedDate = cellDate;
+          openModalForDate(cellDate, entry || null);
+          updateSelectedDayInfo();
+        });
+
+        calendarEl.appendChild(div);
+      }
+
+      updateStats();
+      updateGraph();
+      updateSelectedDayInfo();
+    }
+
+    /* ====== モーダル（気分入力UI） ====== */
+    const modalBackdrop = document.getElementById("modal-backdrop");
+    const modalClose = document.getElementById("modal-close");
+    const moodScaleEl = document.getElementById("mood-scale");
+    const noteEl = document.getElementById("note");
+    const charCountEl = document.getElementById("char-count");
+    const saveBtn = document.getElementById("save-btn");
+    const clearBtn = document.getElementById("clear-btn");
+    const modalTitleEl = document.getElementById("modal-title");
+    const modalSubtitleEl = document.getElementById("modal-subtitle");
+
+    let selectedMood = null;
+    let editingDate = null; // Dateオブジェクト
+
+    function openModalForDate(date, existingEntry) {
+      editingDate = date;
+      const label = formatDateLabel(date);
+      modalTitleEl.textContent = `${label} の気分`;
+      modalSubtitleEl.textContent = "その日の「ざっくりした気分」と、ひとことメモを残しておけます。";
+
+      document
+        .querySelectorAll(".mood-option")
+        .forEach((btn) => btn.classList.remove("active"));
+
+      if (existingEntry && moodMap[existingEntry.mood]) {
+        selectedMood = existingEntry.mood;
+        const activeBtn = document.querySelector(
+          `.mood-option[data-mood="${selectedMood}"]`
+        );
+        if (activeBtn) activeBtn.classList.add("active");
+        noteEl.value = existingEntry.note || "";
+      } else {
+        selectedMood = null;
+        noteEl.value = "";
+      }
+
+      updateCharCount();
+      modalBackdrop.classList.add("show");
+      noteEl.focus();
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove("show");
+      editingDate = null;
+      selectedMood = null;
     }
 
     function updateCharCount() {
@@ -875,65 +1171,138 @@
       charCountEl.textContent = `${len} / 120`;
     }
 
-    function setMood(moodKey) {
+    moodScaleEl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".mood-option");
+      if (!btn) return;
+      const moodKey = btn.getAttribute("data-mood");
+      if (!moodKey) return;
       selectedMood = moodKey;
       document
         .querySelectorAll(".mood-option")
-        .forEach((btn) => btn.classList.remove("active"));
-      const activeBtn = document.querySelector(
-        `.mood-option[data-mood="${moodKey}"]`
-      );
-      if (activeBtn) {
-        activeBtn.classList.add("active");
-      }
-    }
+        .forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
 
-    function renderHistory() {
-      const entries = loadEntries();
-      historyEl.innerHTML = "";
+    noteEl.addEventListener("input", updateCharCount);
 
-      if (!entries.length) {
-        historyEl.innerHTML = `
-          <div class="empty-state fade-in">
-            <span>📝</span>
-            まだ記録がありません。今日の気分を、ひとことだけ残してみませんか？
-          </div>
-        `;
-        entryCountEl.textContent = "0";
-        streakPillEl.textContent = "0 days";
-        avgScoreEl.textContent = "–";
-        avgPillEl.textContent = "new";
+    document.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const template = chip.getAttribute("data-template") || "";
+        if (!noteEl.value.trim()) {
+          noteEl.value = template;
+        } else {
+          noteEl.value = noteEl.value.trim() + " " + template;
+        }
+        noteEl.focus();
+        updateCharCount();
+      });
+    });
+
+    saveBtn.addEventListener("click", () => {
+      if (!editingDate) return;
+
+      if (!selectedMood && !noteEl.value.trim()) {
+        alert("気分かメモのどちらか一方だけでも入力してみてください。");
         return;
       }
 
-      const sorted = [...entries].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      const entries = loadEntries();
+      const dateStr = editingDate.toDateString();
 
-      const recent = sorted.slice(0, 3);
-
-      recent.forEach((entry) => {
-        const mood = moodMap[entry.mood] || moodMap.meh;
-        const div = document.createElement("div");
-        div.className = "history-item fade-in";
-        div.innerHTML = `
-          <div class="history-main">
-            <div class="history-mood">
-              <span>${mood.emoji}</span>
-              <strong>${mood.label}</strong>
-            </div>
-            <div class="history-note">
-              ${entry.note ? escapeHtml(entry.note) : "<span style='opacity:0.7;'>（メモなし）</span>"}
-            </div>
-          </div>
-          <div class="history-meta">
-            <div>${entry.dateLabel}</div>
-            <div>${entry.timeLabel}</div>
-          </div>
-        `;
-        historyEl.appendChild(div);
+      const filtered = entries.filter(e => {
+        const d = new Date(e.createdAt);
+        return !sameDay(d, editingDate);
       });
 
+      const now = new Date();
+      const entry = {
+        id: now.getTime(),
+        mood: selectedMood || "meh",
+        note: noteEl.value.trim(),
+        createdAt: new Date(
+          editingDate.getFullYear(),
+          editingDate.getMonth(),
+          editingDate.getDate(),
+          now.getHours(),
+          now.getMinutes()
+        ).toISOString(),
+        dateLabel: formatDateLabel(editingDate),
+        timeLabel: formatTime(now),
+      };
+
+      filtered.push(entry);
+      saveEntries(filtered);
+
+      saveBtn.textContent = "Saved!";
+      setTimeout(() => {
+        saveBtn.innerHTML = '<span>➤</span>Save';
+      }, 900);
+
+      renderCalendar();
+      closeModal();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      noteEl.value = "";
+      updateCharCount();
+      selectedMood = null;
+      document
+        .querySelectorAll(".mood-option")
+        .forEach((btn) => btn.classList.remove("active"));
+    });
+
+    modalClose.addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) {
+        closeModal();
+      }
+    });
+
+    /* ====== 右側：選択日の表示 ====== */
+    const selectedDayInfoEl = document.getElementById("selected-day-info");
+    const selectedNoteBoxEl = document.getElementById("selected-note-box");
+
+    function updateSelectedDayInfo() {
+      if (!selectedDate) {
+        selectedDayInfoEl.textContent =
+          "まだ日付が選択されていません。カレンダーのどこかをクリックしてみてください。";
+        selectedNoteBoxEl.innerHTML =
+          "<span class='note-empty'>メモはまだありません。</span>";
+        return;
+      }
+
+      const entries = loadEntries();
+      const entry = entries
+        .slice()
+        .reverse()
+        .find(e => sameDay(new Date(e.createdAt), selectedDate));
+
+      const label = formatDateLabel(selectedDate);
+      if (!entry) {
+        selectedDayInfoEl.innerHTML =
+          `選択中の日付: <strong>${label}</strong>（まだ記録はありません）`;
+        selectedNoteBoxEl.innerHTML =
+          "<span class='note-empty'>メモはまだありません。</span>";
+      } else {
+        const mood = moodMap[entry.mood] || moodMap.meh;
+        selectedDayInfoEl.innerHTML =
+          `選択中の日付: <strong>${label}</strong><br>気分: ${mood.emoji} <strong>${mood.label}</strong> / 記録時刻: ${entry.timeLabel}`;
+        selectedNoteBoxEl.innerHTML = entry.note
+          ? escapeHtml(entry.note)
+          : "<span class='note-empty'>メモは登録されていません。</span>";
+      }
+    }
+
+    /* ====== 統計（平均・件数・7日） ====== */
+    const avgScoreEl = document.getElementById("avg-score");
+    const avgPillEl = document.getElementById("avg-pill");
+    const entryCountEl = document.getElementById("entry-count");
+    const streakPillEl = document.getElementById("streak-pill");
+    const graphEl = document.getElementById("graph");
+    const graphLabelsEl = document.getElementById("graph-labels");
+
+    function updateStats() {
+      const entries = loadEntries();
       entryCountEl.textContent = String(entries.length);
 
       const now = new Date();
@@ -950,8 +1319,8 @@
       const streak = daysSet.size;
       streakPillEl.textContent = `${streak} day${streak === 1 ? "" : "s"}`;
 
-      const month = now.getMonth();
-      const year = now.getFullYear();
+      const month = currentMonth;
+      const year = currentYear;
       const monthEntries = entries.filter((e) => {
         const d = new Date(e.createdAt);
         return d.getMonth() === month && d.getFullYear() === year;
@@ -960,6 +1329,7 @@
       if (!monthEntries.length) {
         avgScoreEl.textContent = "–";
         avgPillEl.textContent = "new";
+        avgPillEl.classList.remove("bad");
       } else {
         const avg =
           monthEntries.reduce((sum, e) => {
@@ -983,91 +1353,74 @@
       }
     }
 
-    function escapeHtml(str) {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
+    function updateGraph() {
+      const entries = loadEntries();
+      const now = new Date();
+      const days = [];
 
-    function handleSave() {
-      if (!selectedMood && !noteEl.value.trim()) {
-        alert("気分かメモのどちらか一方だけでも入力してみてください。");
-        return;
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(now.getDate() - i);
+        days.push(d);
       }
 
-      const now = new Date();
-      const entry = {
-        id: now.getTime(),
-        mood: selectedMood || "meh",
-        note: noteEl.value.trim(),
-        createdAt: now.toISOString(),
-        dateLabel: formatDateLabel(now),
-        timeLabel: formatTime(now),
-      };
+      graphEl.innerHTML = "";
+      graphLabelsEl.innerHTML = "";
 
-      const entries = loadEntries();
-      entries.push(entry);
-      saveEntries(entries);
-      renderHistory();
+      const labelsFrag = document.createDocumentFragment();
 
-      noteEl.value = "";
-      updateCharCount();
-      selectedMood = null;
-      document
-        .querySelectorAll(".mood-option")
-        .forEach((btn) => btn.classList.remove("active"));
+      days.forEach((day) => {
+        const entry = entries
+          .slice()
+          .reverse()
+          .find(e => sameDay(new Date(e.createdAt), day));
 
-      saveBtn.textContent = "Saved!";
-      setTimeout(() => {
-        saveBtn.innerHTML = '<span>➤</span>Save today';
-      }, 900);
+        const score = entry ? (moodMap[entry.mood] || moodMap.meh).score : 0;
+
+        const bar = document.createElement("div");
+        bar.className = "graph-bar";
+
+        const inner = document.createElement("div");
+        inner.className = "graph-bar-inner";
+        const height = (score / 4) * 100;
+        inner.style.height = `${height}%`;
+        bar.appendChild(inner);
+        graphEl.appendChild(bar);
+
+        const label = document.createElement("div");
+        label.textContent = `${day.getMonth() + 1}/${day.getDate()}`;
+        labelsFrag.appendChild(label);
+      });
+
+      graphLabelsEl.appendChild(labelsFrag);
     }
 
-    function handleClear() {
-      noteEl.value = "";
-      updateCharCount();
-      selectedMood = null;
-      document
-        .querySelectorAll(".mood-option")
-        .forEach((btn) => btn.classList.remove("active"));
-    }
+    /* ====== 初期化 ====== */
+    document.getElementById("prev-month").addEventListener("click", () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById("next-month").addEventListener("click", () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar();
+    });
 
     function initTodayLabel() {
       todayLabelEl.textContent = formatDateLabel();
     }
 
-    function initTemplateChips() {
-      document.querySelectorAll(".chip").forEach((chip) => {
-        chip.addEventListener("click", () => {
-          const template = chip.getAttribute("data-template") || "";
-          if (!noteEl.value.trim()) {
-            noteEl.value = template;
-          } else {
-            noteEl.value = noteEl.value.trim() + " " + template;
-          }
-          noteEl.focus();
-          updateCharCount();
-        });
-      });
-    }
-
-    moodScaleEl.addEventListener("click", (e) => {
-      const btn = e.target.closest(".mood-option");
-      if (!btn) return;
-      const moodKey = btn.getAttribute("data-mood");
-      if (!moodKey) return;
-      setMood(moodKey);
-    });
-
-    noteEl.addEventListener("input", updateCharCount);
-    saveBtn.addEventListener("click", handleSave);
-    clearBtn.addEventListener("click", handleClear);
-
     initTodayLabel();
     updateCharCount();
-    renderHistory();
-    initTemplateChips();
+    renderCalendar();
   </script>
 </body>
 </html>
