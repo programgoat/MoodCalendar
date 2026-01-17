@@ -2,791 +2,465 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>気分カレンダー＋気分ログ統合版</title>
+  <title>MoodCalendar v3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #020617;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.15);
-      --text-main: #e5e7eb;
-      --text-sub: #9ca3af;
-      --danger: #f97373;
-      --success: #4ade80;
-      --border: #1f2937;
-      --radius-lg: 18px;
-      --radius-md: 10px;
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
-      --transition-fast: 0.18s ease-out;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      background: radial-gradient(circle at top, #1e293b 0, #020617 55%, #000 100%);
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 1120px;
-      background: linear-gradient(145deg, #020617 0%, #020617 55%, #020617 100%);
-      border-radius: 26px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      box-shadow: var(--shadow-soft);
-      padding: 22px 22px 18px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .app::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.18) 0, transparent 55%),
-        radial-gradient(circle at 100% 0%, rgba(129, 140, 248, 0.18) 0, transparent 55%);
-      opacity: 0.7;
-      pointer-events: none;
-    }
-
-    .app-inner {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
-      gap: 18px;
-    }
-
-    @media (max-width: 900px) {
-      .app-inner {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      gap: 12px;
-    }
-
-    .title-block {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 0%, #38bdf8 0, #0ea5e9 40%, #1d4ed8 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #e5f3ff;
-      font-weight: 700;
-      font-size: 18px;
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7),
-        0 10px 25px rgba(56, 189, 248, 0.45);
-    }
-
-    .title-text-main {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .title-pill {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      color: var(--text-sub);
-      background: rgba(15, 23, 42, 0.7);
-    }
-
-    .title-text-sub {
-      font-size: 12px;
-      color: var(--text-sub);
-      margin-top: 2px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--text-sub);
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--success);
-      box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.18);
-    }
-
-    .pill {
-      padding: 4px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.8);
-    }
-
-    .pill strong {
-      color: #e5e7eb;
-      font-weight: 500;
-    }
-
-    .card {
-      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.12), transparent 55%),
-        rgba(15, 23, 42, 0.96);
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 16px 16px 14px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        135deg,
-        rgba(148, 163, 184, 0.25),
-        transparent 40%,
-        transparent 60%,
-        rgba(148, 163, 184, 0.18)
-      );
-      opacity: 0.12;
-      pointer-events: none;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      gap: 10px;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #e5e7eb;
-    }
-
-    .card-subtitle {
-      font-size: 11px;
-      color: var(--text-sub);
-      margin-top: 2px;
-    }
-
-    .badge {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-
-    /* カレンダー */
-    .calendar-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-      font-size: 13px;
-    }
-
-    .calendar-header button {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-sub);
-      cursor: pointer;
-      font-size: 11px;
-      transition: background var(--transition-fast), border-color var(--transition-fast),
-        color var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .calendar-header button:hover {
-      border-color: var(--accent);
-      color: #e5e7eb;
-      background: rgba(15, 23, 42, 0.98);
-      transform: translateY(-1px);
-    }
-
-    .calendar-header strong {
-      font-size: 14px;
-    }
-
-    .weekday-row {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-      margin-bottom: 4px;
-      font-size: 11px;
-      color: var(--text-sub);
-      text-align: center;
-    }
-
-    .calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-    }
-
-    .day {
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(15, 23, 42, 0.9);
-      padding: 8px 6px;
-      text-align: right;
-      cursor: pointer;
-      transition: 0.18s;
-      min-height: 52px;
-      position: relative;
-      font-size: 11px;
-      color: var(--text-sub);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .day:hover {
-      border-color: var(--accent);
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.9);
-      transform: translateY(-1px);
-    }
-
-    .day-number {
-      font-size: 12px;
-      font-weight: 500;
-      color: #e5e7eb;
-    }
-
-    .day-mood-label {
-      font-size: 10px;
-      opacity: 0.9;
-      text-align: left;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .day-today {
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7);
-    }
-
-    /* 気分色 */
-    .mood-bad { background: linear-gradient(145deg, #7f1d1d, #b91c1c) !important; }
-    .mood-meh { background: linear-gradient(145deg, #111827, #374151) !important; }
-    .mood-good { background: linear-gradient(145deg, #14532d, #16a34a) !important; }
-    .mood-great { background: linear-gradient(145deg, #78350f, #f59e0b) !important; }
-
-    .mood-bad .day-number,
-    .mood-meh .day-number,
-    .mood-good .day-number,
-    .mood-great .day-number {
-      color: #f9fafb;
-    }
-
-    .mood-bad .day-mood-label,
-    .mood-meh .day-mood-label,
-    .mood-good .day-mood-label,
-    .mood-great .day-mood-label {
-      color: #e5e7eb;
-    }
-
-    /* 右側：詳細＆グラフ */
-    .right-column {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .stat-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .stat-card {
-      flex: 1;
-      min-width: 0;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.9);
-      padding: 8px 9px;
-      font-size: 11px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .stat-label {
-      color: var(--text-sub);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .stat-value {
-      font-size: 16px;
-      font-weight: 600;
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-    }
-
-    .stat-value span {
-      font-size: 11px;
-      color: var(--text-sub);
-    }
-
-    .stat-pill {
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(22, 163, 74, 0.12);
-      color: #4ade80;
-      font-size: 10px;
-      border: 1px solid rgba(34, 197, 94, 0.4);
-    }
-
-    .stat-pill.bad {
-      background: rgba(248, 113, 113, 0.12);
-      color: #fca5a5;
-      border-color: rgba(248, 113, 113, 0.5);
-    }
-
-    .selected-day-info {
-      font-size: 11px;
-      color: var(--text-sub);
-      margin-top: 4px;
-    }
-
-    .selected-day-info strong {
-      color: #e5e7eb;
-    }
-
-    .note-box {
-      margin-top: 6px;
-      border-radius: var(--radius-md);
-      border: 1px dashed rgba(148, 163, 184, 0.5);
-      padding: 7px 8px;
-      font-size: 11px;
-      color: var(--text-sub);
-      background: rgba(15, 23, 42, 0.85);
-      min-height: 40px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .note-empty {
-      opacity: 0.8;
-    }
-
-    /* グラフ（簡易） */
-    .graph {
-      display: flex;
-      align-items: flex-end;
-      gap: 4px;
-      height: 70px;
-      margin-top: 4px;
-    }
-
-    .graph-bar {
-      flex: 1;
-      border-radius: 4px 4px 0 0;
-      background: rgba(30, 64, 175, 0.4);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .graph-bar-inner {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(180deg, #38bdf8, #0ea5e9);
-    }
-
-    .graph-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 4px;
-      font-size: 9px;
-      color: var(--text-sub);
-    }
-
-    /* モーダル（気分入力UI） */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.18s ease-out;
-    }
-
-    .modal-backdrop.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal {
-      width: 100%;
-      max-width: 420px;
-      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.12), transparent 55%),
-        rgba(15, 23, 42, 0.98);
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.95);
-      padding: 14px 14px 12px;
-      position: relative;
-      transform: translateY(8px);
-      transition: transform 0.18s ease-out;
-    }
-
-    .modal-backdrop.show .modal {
-      transform: translateY(0);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      gap: 8px;
-    }
-
-    .modal-title {
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .modal-subtitle {
-      font-size: 11px;
-      color: var(--text-sub);
-      margin-top: 2px;
-    }
-
-    .modal-close {
-      border: none;
-      background: transparent;
-      color: var(--text-sub);
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .mood-scale {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-
-    .mood-option {
-      flex: 1;
-      padding: 7px 0;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-sub);
-      font-size: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      cursor: pointer;
-      transition: background var(--transition-fast), border-color var(--transition-fast),
-        transform var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
-    }
-
-    .mood-option span {
-      font-size: 13px;
-    }
-
-    .mood-option strong {
-      font-weight: 500;
-      color: #e5e7eb;
-    }
-
-    .mood-option:hover {
-      border-color: var(--accent);
-      background: rgba(15, 23, 42, 0.95);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.7);
-    }
-
-    .mood-option.active {
-      border-color: var(--accent);
-      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.25), rgba(15, 23, 42, 0.98));
-      color: #e5f3ff;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4),
-        0 12px 30px rgba(56, 189, 248, 0.35);
-    }
-
-    .mood-option.active strong {
-      color: #e5f3ff;
-    }
-
-    .textarea-label {
-      font-size: 11px;
-      color: var(--text-sub);
-      margin-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .textarea-label span {
-      opacity: 0.9;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 70px;
-      resize: vertical;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-main);
-      padding: 8px 10px;
-      font-size: 12px;
-      line-height: 1.5;
-      outline: none;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
-        background var(--transition-fast), transform var(--transition-fast);
-    }
-
-    textarea::placeholder {
-      color: rgba(148, 163, 184, 0.7);
-    }
-
-    textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5),
-        0 12px 30px rgba(15, 23, 42, 0.9);
-      background: rgba(15, 23, 42, 0.98);
-      transform: translateY(-1px);
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn-primary {
-      padding: 7px 14px;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(135deg, #38bdf8, #0ea5e9, #6366f1);
-      color: #e5f3ff;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.55);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
-        filter var(--transition-fast);
-      white-space: nowrap;
-    }
-
-    .btn-primary span {
-      font-size: 14px;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px) translateZ(0);
-      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.7);
-      filter: brightness(1.05);
-    }
-
-    .btn-primary:active {
-      transform: translateY(0);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.9);
-      filter: brightness(0.98);
-    }
-
-    .btn-secondary {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-sub);
-      font-size: 11px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      transition: background var(--transition-fast), border-color var(--transition-fast),
-        color var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--accent);
-      color: #e5e7eb;
-      background: rgba(15, 23, 42, 0.98);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary span {
-      font-size: 13px;
-    }
-
-    .chip {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px dashed rgba(148, 163, 184, 0.5);
-      background: rgba(15, 23, 42, 0.8);
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      transition: border-color var(--transition-fast), background var(--transition-fast),
-        transform var(--transition-fast);
-      font-size: 10px;
-      color: var(--text-sub);
-    }
-
-    .chip:hover {
-      border-style: solid;
-      border-color: var(--accent);
-      background: rgba(15, 23, 42, 0.95);
-      transform: translateY(-1px);
-    }
-
-    .footer {
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(30, 64, 175, 0.7);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      font-size: 10px;
-      color: var(--text-sub);
-      flex-wrap: wrap;
-    }
-
-    .footer-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .footer-left strong {
-      color: #e5e7eb;
-      font-weight: 500;
-    }
-
-    .footer-right {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .tiny-pill {
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    .tiny-pill span {
-      font-size: 11px;
-    }
-
-    .tiny-pill strong {
-      color: #e5e7eb;
-      font-weight: 500;
-    }
-
-    .pill-soft {
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      font-size: 10px;
-      color: var(--text-sub);
-    }
-
-    .pill-soft strong {
-      color: #e5e7eb;
-      font-weight: 500;
-    }
-
-    .fade-in {
-      animation: fadeIn 0.25s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(4px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    /* ===========================
+   基本レイアウト
+=========================== */
+
+:root {
+  --bg: #0f172a;
+  --card: #020617;
+  --accent: #38bdf8;
+  --accent-soft: rgba(56, 189, 248, 0.15);
+  --text-main: #e5e7eb;
+  --text-sub: #9ca3af;
+  --danger: #f97373;
+  --success: #4ade80;
+  --border: #1f2937;
+  --radius-lg: 18px;
+  --radius-md: 10px;
+  --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+  --transition-fast: 0.18s ease-out;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: radial-gradient(circle at top, #1e293b 0, #020617 55%, #000 100%);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ===========================
+   アプリ全体
+=========================== */
+
+.app {
+  width: 100%;
+  max-width: 1120px;
+  background: linear-gradient(145deg, #020617 0%, #020617 55%, #020617 100%);
+  border-radius: 26px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: var(--shadow-soft);
+  padding: 22px 22px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.app::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.18) 0, transparent 55%),
+    radial-gradient(circle at 100% 0%, rgba(129, 140, 248, 0.18) 0, transparent 55%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.app-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .app-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ===========================
+   ヘッダー
+=========================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.title-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 0%, #38bdf8 0, #0ea5e9 40%, #1d4ed8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e5f3ff;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7),
+    0 10px 25px rgba(56, 189, 248, 0.45);
+}
+
+.title-text-main {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.title-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: var(--text-sub);
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.title-text-sub {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-sub);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--success);
+  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.18);
+}
+
+/* 使い方ボタン */
+.help-btn {
+  padding: 4px 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-sub);
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.help-btn:hover {
+  transform: scale(1.15);
+  border-color: var(--accent);
+  color: #e5e7eb;
+}
+
+/* ===========================
+   カード
+=========================== */
+
+.card {
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.12), transparent 55%),
+    rgba(15, 23, 42, 0.96);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 16px 16px 14px;
+  position: relative;
+  overflow: hidden;
+  animation: cardPop 0.4s ease-out;
+}
+
+@keyframes cardPop {
+  0% { transform: scale(0.97); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===========================
+   カレンダー
+=========================== */
+
+.calendar-header button {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-sub);
+  cursor: pointer;
+  font-size: 11px;
+  transition: 0.2s;
+}
+
+.calendar-header button:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+  color: #e5e7eb;
+}
+
+.weekday-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: var(--text-sub);
+  text-align: center;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.day {
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+  padding: 8px 6px;
+  text-align: right;
+  cursor: pointer;
+  transition: 0.18s;
+  min-height: 52px;
+  position: relative;
+  font-size: 11px;
+  color: var(--text-sub);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.day:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.9);
+}
+
+.day:active {
+  transform: scale(0.92);
+}
+
+.day-number {
+  font-size: 12px;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+.day-mood-label {
+  font-size: 10px;
+  opacity: 0.9;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 今日 */
+.day-today {
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.7);
+}
+
+/* 気分色 */
+.mood-bad { background: linear-gradient(145deg, #7f1d1d, #b91c1c) !important; }
+.mood-meh { background: linear-gradient(145deg, #111827, #374151) !important; }
+.mood-good { background: linear-gradient(145deg, #14532d, #16a34a) !important; }
+.mood-great { background: linear-gradient(145deg, #78350f, #f59e0b) !important; }
+
+.mood-bad .day-number,
+.mood-meh .day-number,
+.mood-good .day-number,
+.mood-great .day-number {
+  color: #f9fafb;
+}
+
+/* ===========================
+   モーダル（気分入力）
+=========================== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease-out;
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15, 23, 42, 0.98);
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.95);
+  padding: 14px 14px 12px;
+  transform: translateY(20px) scale(0.95);
+  transition: 0.25s ease-out;
+}
+
+.modal-backdrop.show .modal {
+  transform: translateY(0) scale(1);
+}
+
+/* 気分ボタン */
+.mood-option {
+  flex: 1;
+  padding: 7px 0;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-sub);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.mood-option:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+.mood-option.active {
+  animation: moodPop 0.25s ease-out;
+  border-color: var(--accent);
+  background: rgba(56, 189, 248, 0.25);
+  color: #e5f3ff;
+}
+
+@keyframes moodPop {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===========================
+   使い方モーダル
+=========================== */
+
+.help-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+}
+
+.help-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.help-modal {
+  background: #fff;
+  color: #333;
+  padding: 20px;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 380px;
+  animation: helpPop 0.25s ease-out;
+}
+
+@keyframes helpPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.help-close {
+  margin-top: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #38bdf8;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.help-close:hover {
+  transform: scale(1.05);
+}
+
+/* ===========================
+   グラフ
+=========================== */
+
+.graph {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 70px;
+  margin-top: 4px;
+}
+
+.graph-bar {
+  flex: 1;
+  border-radius: 4px 4px 0 0;
+  background: rgba(30, 64, 175, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.graph-bar-inner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #38bdf8, #0ea5e9);
+  height: 0%;
+  animation: barGrow 0.5s ease-out forwards;
+}
+
+@keyframes barGrow {
+  0% { height: 0%; }
+  100% { height: var(--bar-height); }
+}
+
   </style>
+
 </head>
 <body>
+
   <div class="app">
     <div class="app-inner">
+
       <!-- 左：カレンダー -->
       <div>
         <header class="header">
@@ -795,18 +469,22 @@
             <div>
               <div class="title-text-main">
                 Mood Calendar
-                <span class="title-pill">v2</span>
+                <span class="title-pill">v3</span>
               </div>
               <div class="title-text-sub">
                 カレンダーで、1日の気分とひとことメモを残す。
               </div>
             </div>
           </div>
+
           <div class="header-right">
             <div class="dot"></div>
             <div class="pill">
               <strong id="today-label"></strong> の今日
             </div>
+
+            <!-- 使い方ボタン -->
+            <button id="help-btn" class="help-btn">？</button>
           </div>
         </header>
 
@@ -840,6 +518,7 @@
 
       <!-- 右：詳細・統計 -->
       <div class="right-column">
+
         <section class="stat-row">
           <div class="stat-card">
             <div class="stat-label">
@@ -850,10 +529,8 @@
               <span id="avg-score">–</span>
               <span>/ 4</span>
             </div>
-            <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
-              今月登録された日だけを対象にした、ざっくり平均値です。
-            </div>
           </div>
+
           <div class="stat-card">
             <div class="stat-label">
               <span>直近7日間の記録</span>
@@ -862,9 +539,6 @@
             <div class="stat-value">
               <span id="entry-count">0</span>
               <span>entries</span>
-            </div>
-            <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
-              「毎日」じゃなくて、「思い出したときに」つけるくらいで十分です。
             </div>
           </div>
         </section>
@@ -880,7 +554,7 @@
           </div>
 
           <div class="selected-day-info" id="selected-day-info">
-            まだ日付が選択されていません。カレンダーのどこかをクリックしてみてください。
+            まだ日付が選択されていません。
           </div>
           <div class="note-box" id="selected-note-box">
             <span class="note-empty">メモはまだありません。</span>
@@ -892,7 +566,7 @@
             <div>
               <div class="card-title">Last 7 days mood</div>
               <div class="card-subtitle">
-                直近7日間のムードを、ざっくり棒グラフで表示します（1〜4のスコア）。
+                直近7日間のムードを棒グラフで表示します。
               </div>
             </div>
           </div>
@@ -910,517 +584,413 @@
               <strong>ログイン不要</strong> / サーバー送信なし
             </span>
           </div>
-          <div class="footer-right">
-            <div class="tiny-pill">
-              <span>💡</span>
-              <strong>ヒント:</strong> 「完璧に書こう」としないほうが続きます。
-            </div>
-          </div>
         </footer>
       </div>
     </div>
   </div>
 
-  <!-- モーダル：気分入力 -->
+  <!-- ▼▼▼ モーダル：気分入力 ▼▼▼ -->
   <div class="modal-backdrop" id="modal-backdrop">
     <div class="modal">
       <div class="modal-header">
         <div>
           <div class="modal-title" id="modal-title">気分を記録</div>
           <div class="modal-subtitle" id="modal-subtitle">
-            その日の「ざっくりした気分」と、ひとことメモを残しておけます。
+            その日の気分とメモを残せます。
           </div>
         </div>
         <button class="modal-close" id="modal-close">×</button>
       </div>
 
       <div class="mood-scale" id="mood-scale">
-        <button class="mood-option" data-mood="bad">
-          <span>😣</span>
-          <strong>しんどい</strong>
-        </button>
-        <button class="mood-option" data-mood="meh">
-          <span>😐</span>
-          <strong>ふつう</strong>
-        </button>
-        <button class="mood-option" data-mood="good">
-          <span>🙂</span>
-          <strong>わりと良い</strong>
-        </button>
-        <button class="mood-option" data-mood="great">
-          <span>😄</span>
-          <strong>最高</strong>
-        </button>
+        <button class="mood-option" data-mood="bad"><span>😣</span><strong>しんどい</strong></button>
+        <button class="mood-option" data-mood="meh"><span>😐</span><strong>ふつう</strong></button>
+        <button class="mood-option" data-mood="good"><span>🙂</span><strong>わりと良い</strong></button>
+        <button class="mood-option" data-mood="great"><span>😄</span><strong>最高</strong></button>
       </div>
 
       <div class="textarea-label">
-        <span>ひとことメモ（あとで読み返したくなるくらい、ざっくりでOK）</span>
+        <span>ひとことメモ</span>
         <span id="char-count">0 / 120</span>
       </div>
-      <textarea
-        id="note"
-        maxlength="120"
-        placeholder="例）朝はだるかったけど、ランチで少し気分が上がった。夜はゆっくりできそう。"
-      ></textarea>
+      <textarea id="note" maxlength="120"></textarea>
 
       <div class="modal-actions">
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="chip" type="button" data-template="小さな良かったことを書いてみる？">
-            <span>✨</span>
-            良かったことヒント
-          </button>
-          <button class="chip" type="button" data-template="しんどさの原因を一言で書いてみる？">
-            <span>🧩</span>
-            しんどさの正体
-          </button>
-        </div>
-        <div style="display:flex; gap:6px; align-items:center;">
-          <button class="btn-secondary" type="button" id="clear-btn">
-            <span>🧹</span>
-            クリア
-          </button>
-          <button class="btn-primary" type="button" id="save-btn">
-            <span>➤</span>
-            Save
-          </button>
-        </div>
+        <button class="btn-secondary" id="clear-btn">クリア</button>
+        <button class="btn-primary" id="save-btn"><span>➤</span>Save</button>
       </div>
     </div>
   </div>
+  <!-- ▲▲▲ モーダル：気分入力 ▲▲▲ -->
+
+  <!-- ▼▼▼ 使い方モーダル ▼▼▼ -->
+  <div class="help-backdrop" id="help-backdrop">
+    <div class="help-modal">
+      <h2>使い方ガイド</h2>
+      <ul>
+        <li>日付をタップすると気分を登録できます。</li>
+        <li>今日だけ編集できます。翌日以降は閲覧のみ。</li>
+        <li>データはブラウザに保存されます。</li>
+        <li>スマホとPCでUIが自動調整されます。</li>
+      </ul>
+      <button id="help-close" class="help-close">閉じる</button>
+    </div>
+  </div>
+  <!-- ▲▲▲ 使い方モーダル ▲▲▲ -->
 
   <script>
-    /* ====== 共通：前作と同じデータ構造 ====== */
-    const STORAGE_KEY = "today-mood-log-v1";
+    /* ===========================
+   MoodCalendar v3 — JavaScript
+   ・今日だけ編集可能
+   ・翌日以降は閲覧のみ
+   ・スマホ/PC UI判定
+   ・ポップなアニメーション制御
+=========================== */
 
-    const moodMap = {
-      bad: { label: "しんどい", emoji: "😣", score: 1, colorClass: "mood-bad" },
-      meh: { label: "ふつう", emoji: "😐", score: 2, colorClass: "mood-meh" },
-      good: { label: "わりと良い", emoji: "🙂", score: 3, colorClass: "mood-good" },
-      great: { label: "最高", emoji: "😄", score: 4, colorClass: "mood-great" },
-    };
+/* ---------------------------
+   日付フォーマット
+--------------------------- */
+function formatDateKey(date) {
+  return date.toISOString().split("T")[0];
+}
 
-    function loadEntries() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
+function sameDay(a, b) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+/* ---------------------------
+   localStorage
+--------------------------- */
+function loadEntries() {
+  return JSON.parse(localStorage.getItem("moodEntries") || "{}");
+}
+
+function saveEntries(entries) {
+  localStorage.setItem("moodEntries", JSON.stringify(entries));
+}
+
+/* ---------------------------
+   UI要素取得
+--------------------------- */
+const calendarEl = document.getElementById("calendar");
+const monthLabel = document.getElementById("month-label");
+const todayLabel = document.getElementById("today-label");
+
+const modalBackdrop = document.getElementById("modal-backdrop");
+const modalClose = document.getElementById("modal-close");
+const moodButtons = document.querySelectorAll(".mood-option");
+const noteEl = document.getElementById("note");
+const charCount = document.getElementById("char-count");
+const saveBtn = document.getElementById("save-btn");
+const clearBtn = document.getElementById("clear-btn");
+
+const selectedDayInfo = document.getElementById("selected-day-info");
+const selectedNoteBox = document.getElementById("selected-note-box");
+
+const graphEl = document.getElementById("graph");
+const graphLabelsEl = document.getElementById("graph-labels");
+
+const helpBtn = document.getElementById("help-btn");
+const helpBackdrop = document.getElementById("help-backdrop");
+const helpClose = document.getElementById("help-close");
+
+/* ---------------------------
+   状態
+--------------------------- */
+let currentDate = new Date();
+let selectedDate = null;
+let selectedMood = null;
+
+/* ---------------------------
+   スマホ判定
+--------------------------- */
+function isMobile() {
+  return window.innerWidth < 768;
+}
+
+/* ---------------------------
+   カレンダー描画
+--------------------------- */
+function renderCalendar() {
+  calendarEl.innerHTML = "";
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  monthLabel.textContent = `${year}年 ${month + 1}月`;
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  const startWeekday = firstDay.getDay();
+  const totalDays = lastDay.getDate();
+
+  const entries = loadEntries();
+  const today = new Date();
+
+  // 空白
+  for (let i = 0; i < startWeekday; i++) {
+    const blank = document.createElement("div");
+    calendarEl.appendChild(blank);
+  }
+
+  // 日付
+  for (let d = 1; d <= totalDays; d++) {
+    const cell = document.createElement("div");
+    cell.className = "day";
+
+    const dateObj = new Date(year, month, d);
+    const key = formatDateKey(dateObj);
+
+    // 今日
+    if (sameDay(dateObj, today)) {
+      cell.classList.add("day-today");
     }
 
-    function saveEntries(entries) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    // mood
+    if (entries[key]) {
+      const mood = entries[key].mood;
+      cell.classList.add(`mood-${mood}`);
+
+      const label = document.createElement("div");
+      label.className = "day-mood-label";
+      label.textContent = entries[key].label;
+      cell.appendChild(label);
     }
 
-    function formatDateLabel(date = new Date()) {
-      const y = date.getFullYear();
-      const m = date.getMonth() + 1;
-      const d = date.getDate();
-      const weekday = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
-      return `${y}/${m}/${d} (${weekday})`;
-    }
+    const num = document.createElement("div");
+    num.className = "day-number";
+    num.textContent = d;
+    cell.appendChild(num);
 
-    function formatTime(date = new Date()) {
-      const h = String(date.getHours()).padStart(2, "0");
-      const m = String(date.getMinutes()).padStart(2, "0");
-      return `${h}:${m}`;
-    }
+    // クリック
+    cell.addEventListener("click", () => onDayClick(dateObj));
 
-    function escapeHtml(str) {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
+    calendarEl.appendChild(cell);
+  }
+}
 
-    /* ====== カレンダー関連 ====== */
-    const calendarEl = document.getElementById("calendar");
-    const monthLabelEl = document.getElementById("month-label");
-    const todayLabelEl = document.getElementById("today-label");
+/* ---------------------------
+   日付クリック
+--------------------------- */
+function onDayClick(dateObj) {
+  selectedDate = dateObj;
+  const key = formatDateKey(dateObj);
+  const entries = loadEntries();
+  const today = new Date();
 
-    let currentYear = new Date().getFullYear();
-    let currentMonth = new Date().getMonth();
+  // 選択日表示
+  updateSelectedDayDisplay();
 
-    let selectedDate = null; // Dateオブジェクト
+  // 今日以外 → 編集禁止
+  if (!sameDay(dateObj, today)) {
+    return; // モーダル開かない
+  }
 
-    function sameDay(d1, d2) {
-      return d1.getFullYear() === d2.getFullYear() &&
-             d1.getMonth() === d2.getMonth() &&
-             d1.getDate() === d2.getDate();
-    }
+  // 今日 → 編集可能
+  openModal();
 
-    function renderCalendar() {
-      calendarEl.innerHTML = "";
+  // 既存データ
+  if (entries[key]) {
+    selectedMood = entries[key].mood;
+    noteEl.value = entries[key].note;
+    charCount.textContent = `${noteEl.value.length} / 120`;
 
-      const firstDay = new Date(currentYear, currentMonth, 1);
-      const lastDay = new Date(currentYear, currentMonth + 1, 0);
-      const daysInMonth = lastDay.getDate();
-
-      monthLabelEl.textContent = `${currentYear}年 ${currentMonth + 1}月`;
-
-      const entries = loadEntries();
-
-      // 1日が何曜日か
-      const startWeekday = firstDay.getDay();
-      for (let i = 0; i < startWeekday; i++) {
-        const empty = document.createElement("div");
-        calendarEl.appendChild(empty);
-      }
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const cellDate = new Date(currentYear, currentMonth, day);
-        const div = document.createElement("div");
-        div.className = "day";
-
-        const num = document.createElement("div");
-        num.className = "day-number";
-        num.textContent = day;
-
-        const label = document.createElement("div");
-        label.className = "day-mood-label";
-
-        const entry = entries
-          .slice()
-          .reverse()
-          .find(e => {
-            const d = new Date(e.createdAt);
-            return sameDay(d, cellDate);
-          });
-
-        if (entry && moodMap[entry.mood]) {
-          const mood = moodMap[entry.mood];
-          div.classList.add(mood.colorClass);
-          label.textContent = `${mood.emoji} ${mood.label}`;
-        } else {
-          label.textContent = "";
-        }
-
-        const today = new Date();
-        if (sameDay(today, cellDate)) {
-          div.classList.add("day-today");
-        }
-
-        div.appendChild(num);
-        div.appendChild(label);
-
-        div.addEventListener("click", () => {
-          selectedDate = cellDate;
-          openModalForDate(cellDate, entry || null);
-          updateSelectedDayInfo();
-        });
-
-        calendarEl.appendChild(div);
-      }
-
-      updateStats();
-      updateGraph();
-      updateSelectedDayInfo();
-    }
-
-    /* ====== モーダル（気分入力UI） ====== */
-    const modalBackdrop = document.getElementById("modal-backdrop");
-    const modalClose = document.getElementById("modal-close");
-    const moodScaleEl = document.getElementById("mood-scale");
-    const noteEl = document.getElementById("note");
-    const charCountEl = document.getElementById("char-count");
-    const saveBtn = document.getElementById("save-btn");
-    const clearBtn = document.getElementById("clear-btn");
-    const modalTitleEl = document.getElementById("modal-title");
-    const modalSubtitleEl = document.getElementById("modal-subtitle");
-
-    let selectedMood = null;
-    let editingDate = null; // Dateオブジェクト
-
-    function openModalForDate(date, existingEntry) {
-      editingDate = date;
-      const label = formatDateLabel(date);
-      modalTitleEl.textContent = `${label} の気分`;
-      modalSubtitleEl.textContent = "その日の「ざっくりした気分」と、ひとことメモを残しておけます。";
-
-      document
-        .querySelectorAll(".mood-option")
-        .forEach((btn) => btn.classList.remove("active"));
-
-      if (existingEntry && moodMap[existingEntry.mood]) {
-        selectedMood = existingEntry.mood;
-        const activeBtn = document.querySelector(
-          `.mood-option[data-mood="${selectedMood}"]`
-        );
-        if (activeBtn) activeBtn.classList.add("active");
-        noteEl.value = existingEntry.note || "";
-      } else {
-        selectedMood = null;
-        noteEl.value = "";
-      }
-
-      updateCharCount();
-      modalBackdrop.classList.add("show");
-      noteEl.focus();
-    }
-
-    function closeModal() {
-      modalBackdrop.classList.remove("show");
-      editingDate = null;
-      selectedMood = null;
-    }
-
-    function updateCharCount() {
-      const len = noteEl.value.length;
-      charCountEl.textContent = `${len} / 120`;
-    }
-
-    moodScaleEl.addEventListener("click", (e) => {
-      const btn = e.target.closest(".mood-option");
-      if (!btn) return;
-      const moodKey = btn.getAttribute("data-mood");
-      if (!moodKey) return;
-      selectedMood = moodKey;
-      document
-        .querySelectorAll(".mood-option")
-        .forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
+    moodButtons.forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.mood === selectedMood);
     });
+  } else {
+    selectedMood = null;
+    noteEl.value = "";
+    charCount.textContent = "0 / 120";
+    moodButtons.forEach((btn) => btn.classList.remove("active"));
+  }
+}
 
-    noteEl.addEventListener("input", updateCharCount);
+/* ---------------------------
+   選択日表示（右側）
+--------------------------- */
+function updateSelectedDayDisplay() {
+  if (!selectedDate) {
+    selectedDayInfo.textContent = "まだ日付が選択されていません。";
+    selectedNoteBox.innerHTML = `<span class="note-empty">メモはまだありません。</span>`;
+    return;
+  }
 
-    document.querySelectorAll(".chip").forEach((chip) => {
-      chip.addEventListener("click", () => {
-        const template = chip.getAttribute("data-template") || "";
-        if (!noteEl.value.trim()) {
-          noteEl.value = template;
-        } else {
-          noteEl.value = noteEl.value.trim() + " " + template;
-        }
-        noteEl.focus();
-        updateCharCount();
-      });
-    });
+  const key = formatDateKey(selectedDate);
+  const entries = loadEntries();
 
-    saveBtn.addEventListener("click", () => {
-      if (!editingDate) return;
+  selectedDayInfo.textContent = `${selectedDate.getFullYear()}年 ${
+    selectedDate.getMonth() + 1
+  }月 ${selectedDate.getDate()}日`;
 
-      if (!selectedMood && !noteEl.value.trim()) {
-        alert("気分かメモのどちらか一方だけでも入力してみてください。");
-        return;
-      }
+  if (entries[key]) {
+    selectedNoteBox.textContent = entries[key].note || "（メモなし）";
+  } else {
+    selectedNoteBox.innerHTML = `<span class="note-empty">メモはまだありません。</span>`;
+  }
+}
 
-      const entries = loadEntries();
-      const dateStr = editingDate.toDateString();
+/* ---------------------------
+   モーダル
+--------------------------- */
+function openModal() {
+  modalBackdrop.classList.add("show");
+}
 
-      const filtered = entries.filter(e => {
-        const d = new Date(e.createdAt);
-        return !sameDay(d, editingDate);
-      });
+function closeModal() {
+  modalBackdrop.classList.remove("show");
+}
 
-      const now = new Date();
-      const entry = {
-        id: now.getTime(),
-        mood: selectedMood || "meh",
-        note: noteEl.value.trim(),
-        createdAt: new Date(
-          editingDate.getFullYear(),
-          editingDate.getMonth(),
-          editingDate.getDate(),
-          now.getHours(),
-          now.getMinutes()
-        ).toISOString(),
-        dateLabel: formatDateLabel(editingDate),
-        timeLabel: formatTime(now),
-      };
+modalClose.addEventListener("click", closeModal);
+modalBackdrop.addEventListener("click", (e) => {
+  if (e.target === modalBackdrop) closeModal();
+});
 
-      filtered.push(entry);
-      saveEntries(filtered);
+/* ---------------------------
+   気分ボタン
+--------------------------- */
+moodButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    moodButtons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedMood = btn.dataset.mood;
+  });
+});
 
-      saveBtn.textContent = "Saved!";
-      setTimeout(() => {
-        saveBtn.innerHTML = '<span>➤</span>Save';
-      }, 900);
+/* ---------------------------
+   メモ文字数
+--------------------------- */
+noteEl.addEventListener("input", () => {
+  charCount.textContent = `${noteEl.value.length} / 120`;
+});
 
-      renderCalendar();
-      closeModal();
-    });
+/* ---------------------------
+   保存
+--------------------------- */
+saveBtn.addEventListener("click", () => {
+  if (!selectedDate || !selectedMood) return;
 
-    clearBtn.addEventListener("click", () => {
-      noteEl.value = "";
-      updateCharCount();
-      selectedMood = null;
-      document
-        .querySelectorAll(".mood-option")
-        .forEach((btn) => btn.classList.remove("active"));
-    });
+  const key = formatDateKey(selectedDate);
+  const entries = loadEntries();
 
-    modalClose.addEventListener("click", closeModal);
-    modalBackdrop.addEventListener("click", (e) => {
-      if (e.target === modalBackdrop) {
-        closeModal();
-      }
-    });
+  const moodLabels = {
+    bad: "しんどい",
+    meh: "ふつう",
+    good: "わりと良い",
+    great: "最高",
+  };
 
-    /* ====== 右側：選択日の表示 ====== */
-    const selectedDayInfoEl = document.getElementById("selected-day-info");
-    const selectedNoteBoxEl = document.getElementById("selected-note-box");
+  entries[key] = {
+    mood: selectedMood,
+    label: moodLabels[selectedMood],
+    note: noteEl.value,
+    createdAt: new Date().toISOString(),
+  };
 
-    function updateSelectedDayInfo() {
-      if (!selectedDate) {
-        selectedDayInfoEl.textContent =
-          "まだ日付が選択されていません。カレンダーのどこかをクリックしてみてください。";
-        selectedNoteBoxEl.innerHTML =
-          "<span class='note-empty'>メモはまだありません。</span>";
-        return;
-      }
+  saveEntries(entries);
+  closeModal();
+  renderCalendar();
+  updateSelectedDayDisplay();
+});
 
-      const entries = loadEntries();
-      const entry = entries
-        .slice()
-        .reverse()
-        .find(e => sameDay(new Date(e.createdAt), selectedDate));
+/* ---------------------------
+   クリア
+--------------------------- */
+clearBtn.addEventListener("click", () => {
+  noteEl.value = "";
+  charCount.textContent = "0 / 120";
+});
 
-      const label = formatDateLabel(selectedDate);
-      if (!entry) {
-        selectedDayInfoEl.innerHTML =
-          `選択中の日付: <strong>${label}</strong>（まだ記録はありません）`;
-        selectedNoteBoxEl.innerHTML =
-          "<span class='note-empty'>メモはまだありません。</span>";
-      } else {
-        const mood = moodMap[entry.mood] || moodMap.meh;
-        selectedDayInfoEl.innerHTML =
-          `選択中の日付: <strong>${label}</strong><br>気分: ${mood.emoji} <strong>${mood.label}</strong> / 記録時刻: ${entry.timeLabel}`;
-        selectedNoteBoxEl.innerHTML = entry.note
-          ? escapeHtml(entry.note)
-          : "<span class='note-empty'>メモは登録されていません。</span>";
-      }
+/* ---------------------------
+   月移動
+--------------------------- */
+document.getElementById("prev-month").addEventListener("click", () => {
+  currentDate.setMonth(currentDate.getMonth() - 1);
+  renderCalendar();
+});
+
+document.getElementById("next-month").addEventListener("click", () => {
+  currentDate.setMonth(currentDate.getMonth() + 1);
+  renderCalendar();
+});
+
+/* ---------------------------
+   使い方モーダル
+--------------------------- */
+helpBtn.addEventListener("click", () => {
+  helpBackdrop.classList.add("show");
+});
+
+helpClose.addEventListener("click", () => {
+  helpBackdrop.classList.remove("show");
+});
+
+helpBackdrop.addEventListener("click", (e) => {
+  if (e.target === helpBackdrop) helpBackdrop.classList.remove("show");
+});
+
+/* ---------------------------
+   グラフ描画
+--------------------------- */
+function renderGraph() {
+  const entries = loadEntries();
+  const today = new Date();
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    days.push(d);
+  }
+
+  graphEl.innerHTML = "";
+  graphLabelsEl.innerHTML = "";
+
+  days.forEach((d) => {
+    const key = formatDateKey(d);
+    const bar = document.createElement("div");
+    bar.className = "graph-bar";
+
+    const inner = document.createElement("div");
+    inner.className = "graph-bar-inner";
+
+    if (entries[key]) {
+      const moodScore = { bad: 1, meh: 2, good: 3, great: 4 }[
+        entries[key].mood
+      ];
+      inner.style.setProperty("--bar-height", `${(moodScore / 4) * 100}%`);
+    } else {
+      inner.style.setProperty("--bar-height", "0%");
     }
 
-    /* ====== 統計（平均・件数・7日） ====== */
-    const avgScoreEl = document.getElementById("avg-score");
-    const avgPillEl = document.getElementById("avg-pill");
-    const entryCountEl = document.getElementById("entry-count");
-    const streakPillEl = document.getElementById("streak-pill");
-    const graphEl = document.getElementById("graph");
-    const graphLabelsEl = document.getElementById("graph-labels");
+    bar.appendChild(inner);
+    graphEl.appendChild(bar);
 
-    function updateStats() {
-      const entries = loadEntries();
-      entryCountEl.textContent = String(entries.length);
+    const label = document.createElement("div");
+    label.textContent = d.getDate();
+    graphLabelsEl.appendChild(label);
+  });
+}
 
-      const now = new Date();
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(now.getDate() - 6);
+/* ---------------------------
+   初期化
+--------------------------- */
+function init() {
+  const today = new Date();
+  todayLabel.textContent = `${today.getMonth() + 1}月${today.getDate()}日`;
 
-      const daysSet = new Set(
-        entries
-          .map((e) => new Date(e.createdAt))
-          .filter((d) => d >= sevenDaysAgo && d <= now)
-          .map((d) => d.toDateString())
-      );
+  renderCalendar();
+  renderGraph();
+}
 
-      const streak = daysSet.size;
-      streakPillEl.textContent = `${streak} day${streak === 1 ? "" : "s"}`;
+init();
 
-      const month = currentMonth;
-      const year = currentYear;
-      const monthEntries = entries.filter((e) => {
-        const d = new Date(e.createdAt);
-        return d.getMonth() === month && d.getFullYear() === year;
-      });
-
-      if (!monthEntries.length) {
-        avgScoreEl.textContent = "–";
-        avgPillEl.textContent = "new";
-        avgPillEl.classList.remove("bad");
-      } else {
-        const avg =
-          monthEntries.reduce((sum, e) => {
-            const mood = moodMap[e.mood] || moodMap.meh;
-            return sum + mood.score;
-          }, 0) / monthEntries.length;
-
-        const rounded = Math.round(avg * 10) / 10;
-        avgScoreEl.textContent = String(rounded);
-
-        if (rounded >= 3.2) {
-          avgPillEl.textContent = "good";
-          avgPillEl.classList.remove("bad");
-        } else if (rounded <= 1.8) {
-          avgPillEl.textContent = "low";
-          avgPillEl.classList.add("bad");
-        } else {
-          avgPillEl.textContent = "steady";
-          avgPillEl.classList.remove("bad");
-        }
-      }
-    }
-
-    function updateGraph() {
-      const entries = loadEntries();
-      const now = new Date();
-      const days = [];
-
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(now.getDate() - i);
-        days.push(d);
-      }
-
-      graphEl.innerHTML = "";
-      graphLabelsEl.innerHTML = "";
-
-      const labelsFrag = document.createDocumentFragment();
-
-      days.forEach((day) => {
-        const entry = entries
-          .slice()
-          .reverse()
-          .find(e => sameDay(new Date(e.createdAt), day));
-
-        const score = entry ? (moodMap[entry.mood] || moodMap.meh).score : 0;
-
-        const bar = document.createElement("div");
-        bar.className = "graph-bar";
-
-        const inner = document.createElement("div");
-        inner.className = "graph-bar-inner";
-        const height = (score / 4) * 100;
-        inner.style.height = `${height}%`;
-        bar.appendChild(inner);
-        graphEl.appendChild(bar);
-
-        const label = document.createElement("div");
-        label.textContent = `${day.getMonth() + 1}/${day.getDate()}`;
-        labelsFrag.appendChild(label);
-      });
-
-      graphLabelsEl.appendChild(labelsFrag);
-    }
-
-    /* ====== 初期化 ====== */
-    document.getElementById("prev-month").addEventListener("click", () => {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-      }
-      renderCalendar();
-    });
-
-    document.getElementById("next-month").addEventListener("click", () => {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-      renderCalendar();
-    });
-
-    function initTodayLabel() {
-      todayLabelEl.textContent = formatDateLabel();
-    }
-
-    initTodayLabel();
-    updateCharCount();
-    renderCalendar();
   </script>
+
 </body>
 </html>
