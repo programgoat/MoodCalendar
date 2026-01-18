@@ -452,6 +452,62 @@ body {
   0% { height: 0%; }
   100% { height: var(--bar-height); }
 }
+/* 嫌なこと入力欄 */
+.negative-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(148,163,184,0.35);
+  background: rgba(15,23,42,0.85);
+  color: var(--text-main);
+  font-size: 12px;
+  resize: none;
+  min-height: 70px;
+}
+
+/* ボタン行 */
+.negative-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 飛ばすエフェクト */
+.negative-launch-effect {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: 0.25s ease-out;
+  z-index: 999;
+}
+
+.negative-launch-effect.show {
+  opacity: 1;
+}
+
+.negative-card {
+  padding: 14px 18px;
+  background: rgba(15,23,42,0.95);
+  border: 1px solid rgba(148,163,184,0.4);
+  border-radius: 14px;
+  color: var(--text-main);
+  font-size: 13px;
+  max-width: 260px;
+  text-align: center;
+  animation: launchUp 1.4s ease-out forwards;
+  box-shadow: 0 18px 45px rgba(15,23,42,0.9);
+}
+
+@keyframes launchUp {
+  0% { transform: translateY(40px) scale(0.9); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-260px) scale(0.6); opacity: 0; }
+}
 
   </style>
 
@@ -542,6 +598,34 @@ body {
             </div>
           </div>
         </section>
+</section>  <!-- ← Selected day カードの終了 -->
+
+<!-- ▼▼▼ ここに追加する ▼▼▼ -->
+<section class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">今日嫌だったこと</div>
+      <div class="card-subtitle">
+        今日だけ編集できます。嫌なことを宇宙に飛ばせます。
+      </div>
+    </div>
+  </div>
+
+  <textarea id="negative-input" class="negative-input" maxlength="200"
+    placeholder="今日嫌だったことを書いてください…"></textarea>
+
+  <div class="negative-actions">
+    <button id="negative-launch-btn" class="btn-primary">
+      🚀 嫌なことを飛ばす
+    </button>
+  </div>
+</section>
+<!-- ▲▲▲ ここまで追加 ▲▲▲ -->
+
+<section class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Last 7 days mood</div>
 
         <section class="card">
           <div class="card-header">
@@ -803,11 +887,14 @@ function onDayClick(dateObj) {
     moodButtons.forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.mood === selectedMood);
     });
+    const negativeInput = document.getElementById("negative-input"); 
+    negativeInput.value = entries[key].negative || "";
   } else {
     selectedMood = null;
     noteEl.value = "";
     charCount.textContent = "0 / 120";
     moodButtons.forEach((btn) => btn.classList.remove("active"));
+    const negativeInput = document.getElementById("negative-input"); negativeInput.value = "";
   }
 }
 
@@ -889,6 +976,7 @@ saveBtn.addEventListener("click", () => {
     mood: selectedMood,
     label: moodLabels[selectedMood],
     note: noteEl.value,
+    negative: document.getElementById("negative-input").value, 
     createdAt: new Date().toISOString(),
   };
 
@@ -987,6 +1075,28 @@ function init() {
   renderCalendar();
   renderGraph();
 }
+/* ---------------------------
+   嫌なことを飛ばすエフェクト
+--------------------------- */
+const negativeLaunchBtn = document.getElementById("negative-launch-btn");
+const negativeEffect = document.getElementById("negative-launch-effect");
+const negativeCard = negativeEffect.querySelector(".negative-card");
+
+negativeLaunchBtn.addEventListener("click", () => {
+  const text = document.getElementById("negative-input").value.trim();
+  if (!text) return;
+
+  // カードにテキストを入れる
+  negativeCard.textContent = text;
+
+  // エフェクト開始
+  negativeEffect.classList.add("show");
+
+  // 終了処理
+  setTimeout(() => {
+    negativeEffect.classList.remove("show");
+  }, 1400);
+});
 
 init();
 
