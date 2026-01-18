@@ -1,982 +1,996 @@
 <!DOCTYPE html>
-<html lang="ja" data-theme="Crystal">
+<html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>MoodOS v3.9 - MoodCalendar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>MoodCalendar v3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  /* =========================================
-   基本リセット
-========================================= */
+  <style>
+    /* ===========================
+   基本レイアウト
+=========================== */
+
+:root {
+  --bg: #0f172a;
+  --card: #020617;
+  --accent: #38bdf8;
+  --accent-soft: rgba(56, 189, 248, 0.15);
+  --text-main: #e5e7eb;
+  --text-sub: #9ca3af;
+  --danger: #f97373;
+  --success: #4ade80;
+  --border: #1f2937;
+  --radius-lg: 18px;
+  --radius-md: 10px;
+  --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+  --transition-fast: 0.18s ease-out;
+}
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* =========================================
-   レイアウト
-========================================= */
-#app-root {
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: radial-gradient(circle at top, #1e293b 0, #020617 55%, #000 100%);
+  color: var(--text-main);
   display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-/* ===== Header ===== */
-.app-header {
-  padding: 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
 
-.app-title {
-  font-size: 24px;
-  font-weight: 600;
-}
+/* ===========================
+   アプリ全体
+=========================== */
 
-.app-subtitle {
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-.header-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.header-btn {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  transition: 0.15s;
-}
-
-.header-btn:hover {
-  opacity: 0.8;
-}
-
-/* =========================================
-   Main Layout
-========================================= */
-.app-main {
-  flex: 1;
-  display: flex;
+.app {
+  width: 100%;
+  max-width: 1120px;
+  background: linear-gradient(145deg, #020617 0%, #020617 55%, #020617 100%);
+  border-radius: 26px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: var(--shadow-soft);
+  padding: 22px 22px 18px;
+  position: relative;
   overflow: hidden;
 }
 
-/* ===== カレンダー ===== */
-.calendar-section {
-  flex: 1;
-  padding: 16px;
-  border-right: 1px solid var(--border);
+.app::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.18) 0, transparent 55%),
+    radial-gradient(circle at 100% 0%, rgba(129, 140, 248, 0.18) 0, transparent 55%);
+  opacity: 0.7;
+  pointer-events: none;
 }
 
-.calendar-header-row {
+.app-inner {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  font-weight: 600;
-  margin-bottom: 8px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+  gap: 18px;
 }
 
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+@media (max-width: 900px) {
+  .app-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
-.calendar-cell {
-  padding: 10px;
-  border-radius: 6px;
-  text-align: center;
-  cursor: pointer;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  transition: 0.15s;
-}
+/* ===========================
+   ヘッダー
+=========================== */
 
-.calendar-cell:hover {
-  opacity: 0.8;
-}
-
-.calendar-cell.selected {
-  border: 2px solid var(--accent);
-}
-
-/* =========================================
-   Side Panel
-========================================= */
-.side-panel-section {
-  width: 320px;
-  padding: 16px;
-  overflow-y: auto;
+.header {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.panel-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.panel-subtitle {
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-/* =========================================
-   機械くん
-========================================= */
-.machine-bubble {
-  margin-top: 8px;
-  padding: 12px;
-  border-radius: 8px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  display: flex;
-  gap: 12px;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
 }
 
-.machine-bubble.hidden {
-  display: none;
+.title-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.machine-face {
+.logo {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  position: relative;
-}
-
-.machine-eye {
-  width: 6px;
-  height: 6px;
-  background: var(--text);
-  border-radius: 50%;
-  position: absolute;
-  top: 10px;
-}
-
-.machine-eye.left { left: 8px; }
-.machine-eye.right { right: 8px; }
-
-.machine-mouth {
-  width: 12px;
-  height: 2px;
-  background: var(--text);
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* =========================================
-   タスク
-========================================= */
-.task-input-row {
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 0%, #38bdf8 0, #0ea5e9 40%, #1d4ed8 100%);
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  color: #e5f3ff;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7),
+    0 10px 25px rgba(56, 189, 248, 0.45);
 }
 
-.task-input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.secondary-btn {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-}
-
-.task-list {
-  margin-top: 8px;
-  list-style: none;
+.title-text-main {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 6px;
 }
 
-.task-item {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+.title-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: var(--text-sub);
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.title-text-sub {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+.header-right {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-}
-
-/* =========================================
-   天気
-========================================= */
-.weather-content {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-}
-
-/* =========================================
-   モーダル
-========================================= */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-backdrop.hidden {
-  display: none;
-}
-
-.modal {
-  width: 360px;
-  background: var(--surface);
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  padding: 16px;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-close-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.mood-buttons-row {
-  display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
-}
-
-.mood-btn {
-  flex: 1;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-}
-
-.modal-textarea {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-}
-
-/* =========================================
-   ボタン（共通）
-========================================= */
-.primary-btn {
-  padding: 10px 14px;
-  border-radius: 6px;
-  border: none;
-  background: var(--accent);
-  color: white;
-  cursor: pointer;
-}
-
-.danger-btn {
-  padding: 10px 14px;
-  border-radius: 6px;
-  border: none;
-  background: var(--danger);
-  color: white;
-  cursor: pointer;
-}
-
-/* =========================================
-   設定パネル
-========================================= */
-.settings-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.3);
-  display: flex;
+  font-size: 11px;
+  color: var(--text-sub);
+  flex-wrap: wrap;
   justify-content: flex-end;
 }
 
-.settings-backdrop.hidden {
-  display: none;
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--success);
+  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.18);
 }
 
-.settings-panel {
-  width: 320px;
-  height: 100%;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  padding: 16px;
-  overflow-y: auto;
-}
-
-.theme-card-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.theme-card {
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+/* 使い方ボタン */
+.help-btn {
+  padding: 4px 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-sub);
   cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.help-btn:hover {
+  transform: scale(1.15);
+  border-color: var(--accent);
+  color: #e5e7eb;
+}
+
+/* ===========================
+   カード
+=========================== */
+
+.card {
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.12), transparent 55%),
+    rgba(15, 23, 42, 0.96);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 16px 16px 14px;
+  position: relative;
+  overflow: hidden;
+  animation: cardPop 0.4s ease-out;
+}
+
+@keyframes cardPop {
+  0% { transform: scale(0.97); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===========================
+   カレンダー
+=========================== */
+
+.calendar-header button {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-sub);
+  cursor: pointer;
+  font-size: 11px;
+  transition: 0.2s;
+}
+
+.calendar-header button:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+  color: #e5e7eb;
+}
+
+.weekday-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: var(--text-sub);
   text-align: center;
 }
 
-/* =========================================
-   変数（テーマ側で上書き）
-========================================= */
-:root {
-  --bg: #f5f5f5;
-  --surface: #ffffff;
-  --border: #d0d0d0;
-  --text: #333;
-  --accent: #007aff;
-  --danger: #ff3b30;
-}
-/* =========================================
-   テーマ変数（Crystal）
-========================================= */
-html[data-theme="Crystal"] {
-  --bg: #f7f9fc;
-  --surface: #ffffff;
-  --border: #d9e2ec;
-  --text: #2e3a45;
-  --accent: #4da3ff;
-  --danger: #ff4d4d;
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
 }
 
-/* =========================================
-   Midnight（深い青の夜）
-========================================= */
-html[data-theme="Midnight"] {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --border: #30363d;
-  --text: #c9d1d9;
-  --accent: #58a6ff;
-  --danger: #ff6b6b;
+.day {
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+  padding: 8px 6px;
+  text-align: right;
+  cursor: pointer;
+  transition: 0.18s;
+  min-height: 52px;
+  position: relative;
+  font-size: 11px;
+  color: var(--text-sub);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-/* =========================================
-   Cosmos（宇宙・星屑）
-========================================= */
-html[data-theme="Cosmos"] {
-  --bg: #0b0f2a;
-  --surface: #151a3b;
-  --border: #2a2f55;
-  --text: #e0e6ff;
-  --accent: #8f7aff;
-  --danger: #ff5f8a;
+.day:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.9);
 }
 
-/* =========================================
-   Neon（未来・光のライン）
-========================================= */
-html[data-theme="Neon"] {
-  --bg: #0f0f0f;
-  --surface: #1a1a1a;
-  --border: #333;
-  --text: #e6e6e6;
-  --accent: #00eaff;
-  --danger: #ff3b6b;
+.day:active {
+  transform: scale(0.92);
 }
 
-/* =========================================
-   Ruins（遺跡・砂・古代）
-========================================= */
-html[data-theme="Ruins"] {
-  --bg: #f3efe6;
-  --surface: #fdfbf7;
-  --border: #d6c9b8;
-  --text: #4a3f35;
-  --accent: #c49b5f;
-  --danger: #b85c4c;
+.day-number {
+  font-size: 12px;
+  font-weight: 500;
+  color: #e5e7eb;
 }
 
-/* =========================================
-   テーマカードのプレビュー色
-========================================= */
-.theme-preview-crystal {
-  background: linear-gradient(135deg, #ffffff, #e8f0ff);
+.day-mood-label {
+  font-size: 10px;
+  opacity: 0.9;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.theme-preview-midnight {
-  background: linear-gradient(135deg, #0d1117, #1f2937);
+/* 今日 */
+.day-today {
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.7);
 }
 
-.theme-preview-cosmos {
-  background: linear-gradient(135deg, #0b0f2a, #3a2f7a);
+/* 気分色 */
+.mood-bad { background: linear-gradient(145deg, #7f1d1d, #b91c1c) !important; }
+.mood-meh { background: linear-gradient(145deg, #111827, #374151) !important; }
+.mood-good { background: linear-gradient(145deg, #14532d, #16a34a) !important; }
+.mood-great { background: linear-gradient(145deg, #78350f, #f59e0b) !important; }
+
+.mood-bad .day-number,
+.mood-meh .day-number,
+.mood-good .day-number,
+.mood-great .day-number {
+  color: #f9fafb;
 }
 
-.theme-preview-neon {
-  background: linear-gradient(135deg, #0f0f0f, #00eaff33);
+/* ===========================
+   モーダル（気分入力）
+=========================== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease-out;
 }
 
-.theme-preview-ruins {
-  background: linear-gradient(135deg, #f3efe6, #d6c9b8);
-}
-
-/* =========================================
-   テーマカード（選択時の強調）
-========================================= */
-.theme-card.active {
-  border: 2px solid var(--accent);
-  background: var(--surface);
+.modal-backdrop.show {
   opacity: 1;
+  pointer-events: auto;
 }
 
-.theme-card:hover {
-  opacity: 0.85;
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15, 23, 42, 0.98);
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.95);
+  padding: 14px 14px 12px;
+  transform: translateY(20px) scale(0.95);
+  transition: 0.25s ease-out;
 }
 
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/theme.css" />
+.modal-backdrop.show .modal {
+  transform: translateY(0) scale(1);
+}
+
+/* 気分ボタン */
+.mood-option {
+  flex: 1;
+  padding: 7px 0;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-sub);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.mood-option:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+.mood-option.active {
+  animation: moodPop 0.25s ease-out;
+  border-color: var(--accent);
+  background: rgba(56, 189, 248, 0.25);
+  color: #e5f3ff;
+}
+
+@keyframes moodPop {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===========================
+   使い方モーダル
+=========================== */
+
+.help-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+}
+
+.help-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.help-modal {
+  background: #fff;
+  color: #333;
+  padding: 20px;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 380px;
+  animation: helpPop 0.25s ease-out;
+}
+
+@keyframes helpPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.help-close {
+  margin-top: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #38bdf8;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.help-close:hover {
+  transform: scale(1.05);
+}
+
+/* ===========================
+   グラフ
+=========================== */
+
+.graph {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 70px;
+  margin-top: 4px;
+}
+
+.graph-bar {
+  flex: 1;
+  border-radius: 4px 4px 0 0;
+  background: rgba(30, 64, 175, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.graph-bar-inner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #38bdf8, #0ea5e9);
+  height: 0%;
+  animation: barGrow 0.5s ease-out forwards;
+}
+
+@keyframes barGrow {
+  0% { height: 0%; }
+  100% { height: var(--bar-height); }
+}
+
+  </style>
+
 </head>
-
 <body>
-  <div id="app-root">
 
-    <!-- =========================
-         Header
-    ========================== -->
-    <header class="app-header">
-      <div class="app-title-area">
-        <h1 class="app-title">MoodOS</h1>
-        <p class="app-subtitle">気分と毎日を、ちいさなOSで。</p>
-      </div>
+  <div class="app">
+    <div class="app-inner">
 
-      <div class="app-header-controls">
-        <div class="current-date-display">
-          <span id="current-year"></span>
-          <span> / </span>
-          <span id="current-month"></span>
-        </div>
-
-        <div class="header-buttons">
-          <button id="prev-month-btn" class="header-btn" type="button">◀</button>
-          <button id="today-btn" class="header-btn" type="button">今日</button>
-          <button id="next-month-btn" class="header-btn" type="button">▶</button>
-
-          <button id="open-settings-btn" class="header-btn settings-btn" type="button">
-            ⚙ 設定
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- =========================
-         Main Layout
-    ========================== -->
-    <main class="app-main">
-
-      <!-- ===== カレンダー ===== -->
-      <section class="calendar-section">
-        <div class="calendar-header-row">
-          <div class="weekday-label">日</div>
-          <div class="weekday-label">月</div>
-          <div class="weekday-label">火</div>
-          <div class="weekday-label">水</div>
-          <div class="weekday-label">木</div>
-          <div class="weekday-label">金</div>
-          <div class="weekday-label">土</div>
-        </div>
-
-        <div id="calendar-grid" class="calendar-grid">
-          <!-- JS で生成 -->
-        </div>
-      </section>
-
-      <!-- ===== 右側パネル ===== -->
-      <section class="side-panel-section">
-
-        <!-- 選択中の日付 -->
-        <div class="selected-day-panel">
-          <h2 class="panel-title">選択中の日付</h2>
-          <div class="selected-day-display">
-            <span id="selected-date-label">未選択</span>
-          </div>
-
-          <!-- 機械くん -->
-          <div class="machine-bubble-wrapper">
-            <div id="machine-bubble" class="machine-bubble hidden">
-              <div class="machine-face">
-                <span class="machine-eye left"></span>
-                <span class="machine-eye right"></span>
-                <span class="machine-mouth"></span>
+      <!-- 左：カレンダー -->
+      <div>
+        <header class="header">
+          <div class="title-block">
+            <div class="logo">M</div>
+            <div>
+              <div class="title-text-main">
+                Mood Calendar
+                <span class="title-pill">v3</span>
               </div>
-              <div class="machine-message" id="machine-message-text"></div>
-            </div>
-          </div>
-
-          <!-- 気分サマリー -->
-          <div class="day-summary">
-            <h3 class="panel-subtitle">その日の気分</h3>
-            <div id="day-mood-summary" class="day-mood-summary">
-              記録がありません。
-            </div>
-          </div>
-
-          <!-- 気分記録ボタン -->
-          <div class="day-actions">
-            <button id="open-mood-modal-btn" class="primary-btn" type="button">
-              今日の気分を記録する
-            </button>
-          </div>
-        </div>
-
-        <!-- タスク -->
-        <div class="task-panel">
-          <h2 class="panel-title">今日のタスク</h2>
-          <div class="task-input-row">
-            <input id="new-task-input" type="text" class="task-input" placeholder="タスクを入力して Enter" />
-            <button id="add-task-btn" class="secondary-btn" type="button">追加</button>
-          </div>
-          <ul id="task-list" class="task-list"></ul>
-        </div>
-
-        <!-- 天気 -->
-        <div class="weather-panel">
-          <h2 class="panel-title">明日の天気</h2>
-          <div id="weather-content" class="weather-content">
-            <div class="weather-icon-placeholder">☁</div>
-            <div class="weather-text">
-              <div id="weather-main" class="weather-main">読み込み待ち</div>
-              <div id="weather-temp" class="weather-temp"></div>
-              <div id="weather-comment" class="weather-comment">
-                機械くんがここで一言しゃべるよ。
+              <div class="title-text-sub">
+                カレンダーで、1日の気分とひとことメモを残す。
               </div>
             </div>
           </div>
-        </div>
 
-      </section>
-    </main>
+          <div class="header-right">
+            <div class="dot"></div>
+            <div class="pill">
+              <strong id="today-label"></strong> の今日
+            </div>
 
-    <!-- =========================
-         Mood Modal
-    ========================== -->
-    <div id="mood-modal-backdrop" class="modal-backdrop hidden">
-      <div class="modal">
-        <div class="modal-header">
-          <h2 class="modal-title">今日の気分を記録</h2>
-          <button id="close-mood-modal-btn" class="modal-close-btn" type="button">×</button>
-        </div>
-
-        <div class="modal-body">
-          <div class="mood-buttons-row">
-            <button class="mood-btn" data-mood="great">最高</button>
-            <button class="mood-btn" data-mood="good">いい感じ</button>
-            <button class="mood-btn" data-mood="neutral">ふつう</button>
-            <button class="mood-btn" data-mood="bad">ちょっとつらい</button>
-            <button class="mood-btn" data-mood="awful">最悪</button>
+            <!-- 使い方ボタン -->
+            <button id="help-btn" class="help-btn">？</button>
           </div>
+        </header>
 
-          <div class="modal-section">
-            <label for="mood-note-input" class="modal-label">メモ</label>
-            <textarea id="mood-note-input" class="modal-textarea" rows="4"></textarea>
-          </div>
-
-          <div class="modal-section">
-            <label for="negative-note-input" class="modal-label">嫌だったこと</label>
-            <textarea id="negative-note-input" class="modal-textarea negative" rows="3"></textarea>
-            <div class="negative-actions">
-              <button id="launch-negative-btn" class="danger-btn">嫌なことを宇宙に飛ばす</button>
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Mood calendar</div>
+              <div class="card-subtitle">
+                日付をクリックして、その日の気分とメモを登録できます。
+              </div>
+            </div>
+            <div class="badge">
+              <span class="badge-dot"></span>
+              local only / auto-save
             </div>
           </div>
-        </div>
 
-        <div class="modal-footer">
-          <button id="save-mood-btn" class="primary-btn">記録を保存</button>
-        </div>
+          <div class="calendar-header">
+            <button id="prev-month">← 前の月</button>
+            <strong id="month-label"></strong>
+            <button id="next-month">次の月 →</button>
+          </div>
+
+          <div class="weekday-row">
+            <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+          </div>
+
+          <div class="calendar" id="calendar"></div>
+        </section>
       </div>
 
-      <div id="negative-launch-layer" class="negative-launch-layer hidden">
-        <div class="negative-card" id="negative-card-visual"></div>
-        <div class="space-background"></div>
-      </div>
-    </div>
+      <!-- 右：詳細・統計 -->
+      <div class="right-column">
 
-    <!-- =========================
-         Settings Panel
-    ========================== -->
-    <div id="settings-backdrop" class="settings-backdrop hidden">
-      <div class="settings-panel">
-        <div class="settings-header">
-          <h2 class="settings-title">設定</h2>
-          <button id="close-settings-btn" class="settings-close-btn">×</button>
-        </div>
-
-        <div class="settings-body">
-
-          <!-- テーマ -->
-          <section class="settings-section">
-            <h3 class="settings-section-title">テーマ</h3>
-            <div class="theme-card-grid">
-              <button class="theme-card" data-theme="Crystal">Crystal</button>
-              <button class="theme-card" data-theme="Midnight">Midnight</button>
-              <button class="theme-card" data-theme="Cosmos">Cosmos</button>
-              <button class="theme-card" data-theme="Neon">Neon</button>
-              <button class="theme-card" data-theme="Ruins">Ruins</button>
+        <section class="stat-row">
+          <div class="stat-card">
+            <div class="stat-label">
+              <span>今月の平均ムード</span>
+              <span class="stat-pill" id="avg-pill">new</span>
             </div>
-          </section>
+            <div class="stat-value">
+              <span id="avg-score">–</span>
+              <span>/ 4</span>
+            </div>
+          </div>
 
-        </div>
+          <div class="stat-card">
+            <div class="stat-label">
+              <span>直近7日間の記録</span>
+              <span class="stat-pill bad" id="streak-pill">0 days</span>
+            </div>
+            <div class="stat-value">
+              <span id="entry-count">0</span>
+              <span>entries</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Selected day</div>
+              <div class="card-subtitle">
+                カレンダーで選択した日の気分とメモを表示します。
+              </div>
+            </div>
+          </div>
+
+          <div class="selected-day-info" id="selected-day-info">
+            まだ日付が選択されていません。
+          </div>
+          <div class="note-box" id="selected-note-box">
+            <span class="note-empty">メモはまだありません。</span>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Last 7 days mood</div>
+              <div class="card-subtitle">
+                直近7日間のムードを棒グラフで表示します。
+              </div>
+            </div>
+          </div>
+
+          <div class="graph" id="graph"></div>
+          <div class="graph-labels" id="graph-labels"></div>
+        </section>
+
+        <footer class="footer">
+          <div class="footer-left">
+            <span>データは</span>
+            <strong>このブラウザだけ</strong>
+            <span>に保存されます。</span>
+            <span class="pill-soft">
+              <strong>ログイン不要</strong> / サーバー送信なし
+            </span>
+          </div>
+        </footer>
       </div>
     </div>
-
-    <!-- =========================
-         Audio
-    ========================== -->
-    <audio id="ui-sound-tap" src="" preload="auto"></audio>
-    <audio id="ui-sound-save" src="" preload="auto"></audio>
-    <audio id="ui-sound-close" src="" preload="auto"></audio>
-    <audio id="ui-sound-launch" src="" preload="auto"></audio>
-
   </div>
 
-  /* =========================================
-   MoodOS v3.9 - theme.js
-   テーマ切り替え・保存・復元
-========================================= */
+  <!-- ▼▼▼ モーダル：気分入力 ▼▼▼ -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modal-title">気分を記録</div>
+          <div class="modal-subtitle" id="modal-subtitle">
+            その日の気分とメモを残せます。
+          </div>
+        </div>
+        <button class="modal-close" id="modal-close">×</button>
+      </div>
 
-/* ===== テーマ適用 ===== */
-function applyTheme(themeName) {
-  document.documentElement.setAttribute("data-theme", themeName);
-  localStorage.setItem("moodos-theme", themeName);
-  updateThemeCardActive(themeName);
-  updateMachineMessage(themeName);
+      <div class="mood-scale" id="mood-scale">
+        <button class="mood-option" data-mood="bad"><span>😣</span><strong>しんどい</strong></button>
+        <button class="mood-option" data-mood="meh"><span>😐</span><strong>ふつう</strong></button>
+        <button class="mood-option" data-mood="good"><span>🙂</span><strong>わりと良い</strong></button>
+        <button class="mood-option" data-mood="great"><span>😄</span><strong>最高</strong></button>
+      </div>
+
+      <div class="textarea-label">
+        <span>ひとことメモ</span>
+        <span id="char-count">0 / 120</span>
+      </div>
+      <textarea id="note" maxlength="120"></textarea>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" id="clear-btn">クリア</button>
+        <button class="btn-primary" id="save-btn"><span>➤</span>Save</button>
+      </div>
+    </div>
+  </div>
+  <!-- ▲▲▲ モーダル：気分入力 ▲▲▲ -->
+
+  <!-- ▼▼▼ 使い方モーダル ▼▼▼ -->
+  <div class="help-backdrop" id="help-backdrop">
+    <div class="help-modal">
+      <h2>使い方ガイド</h2>
+      <ul>
+        <li>日付をタップすると気分を登録できます。</li>
+        <li>今日だけ編集できます。翌日以降は閲覧のみ。</li>
+        <li>データはブラウザに保存されます。</li>
+        <li>スマホとPCでUIが自動調整されます。</li>
+      </ul>
+      <button id="help-close" class="help-close">閉じる</button>
+    </div>
+  </div>
+  <!-- ▲▲▲ 使い方モーダル ▲▲▲ -->
+
+  <script>
+    /* ===========================
+   MoodCalendar v3 — JavaScript
+   ・今日だけ編集可能
+   ・翌日以降は閲覧のみ
+   ・スマホ/PC UI判定
+   ・ポップなアニメーション制御
+=========================== */
+
+/* ---------------------------
+   日付フォーマット
+--------------------------- */
+function formatDateKey(date) {
+  return date.toISOString().split("T")[0];
 }
 
-/* ===== テーマカードの active 表示 ===== */
-function updateThemeCardActive(activeTheme) {
-  const cards = document.querySelectorAll(".theme-card");
-  cards.forEach(card => {
-    const theme = card.getAttribute("data-theme");
-    if (theme === activeTheme) {
-      card.classList.add("active");
-    } else {
-      card.classList.remove("active");
-    }
-  });
+function sameDay(a, b) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
-/* =========================================
-   機械くんのテーマ別セリフ
-========================================= */
-const themeMessages = {
-  Crystal: [
-    "透き通った気持ちでいこう。",
-    "今日もクリアにいこうね。",
-    "光が差し込んでるよ。"
-  ],
-  Midnight: [
-    "静かな夜みたいに落ち着いていこう。",
-    "深呼吸して、ゆっくりね。",
-    "夜の青は心を整えてくれるよ。"
-  ],
-  Cosmos: [
-    "星の海みたいに広く考えてみよう。",
-    "宇宙は静かで、でも優しいよ。",
-    "今日の気分も、星屑みたいに輝くかも。"
-  ],
-  Neon: [
-    "未来の光が君を照らしてるよ。",
-    "ピカッといこう、ピカッと。",
-    "スピード感ある一日にしよう。"
-  ],
-  Ruins: [
-    "古代の風がそっと背中を押してるよ。",
-    "落ち着いた空気が心地いいね。",
-    "ゆっくり進めば大丈夫だよ。"
-  ]
-};
-
-/* ===== 機械くんのセリフ更新 ===== */
-function updateMachineMessage(themeName) {
-  const bubble = document.getElementById("machine-bubble");
-  const text = document.getElementById("machine-message-text");
-
-  if (!bubble || !text) return;
-
-  const messages = themeMessages[themeName];
-  if (!messages) return;
-
-  const random = messages[Math.floor(Math.random() * messages.length)];
-
-  bubble.classList.remove("hidden");
-  text.textContent = random;
+/* ---------------------------
+   localStorage
+--------------------------- */
+function loadEntries() {
+  return JSON.parse(localStorage.getItem("moodEntries") || "{}");
 }
 
-/* =========================================
-   初期化処理
-========================================= */
-function initThemeSystem() {
-  const savedTheme = localStorage.getItem("moodos-theme") || "Crystal";
-  applyTheme(savedTheme);
-
-  const cards = document.querySelectorAll(".theme-card");
-  cards.forEach(card => {
-    card.addEventListener("click", () => {
-      const theme = card.getAttribute("data-theme");
-      applyTheme(theme);
-    });
-  });
+function saveEntries(entries) {
+  localStorage.setItem("moodEntries", JSON.stringify(entries));
 }
 
-/* ===== DOM読み込み後に初期化 ===== */
-document.addEventListener("DOMContentLoaded", initThemeSystem);
-/* =========================================
-   MoodOS v3.9 - app.js
-   カレンダー / モーダル / タスク / 天気
-========================================= */
+/* ---------------------------
+   UI要素取得
+--------------------------- */
+const calendarEl = document.getElementById("calendar");
+const monthLabel = document.getElementById("month-label");
+const todayLabel = document.getElementById("today-label");
 
-/* =========================================
-   カレンダー生成
-========================================= */
+const modalBackdrop = document.getElementById("modal-backdrop");
+const modalClose = document.getElementById("modal-close");
+const moodButtons = document.querySelectorAll(".mood-option");
+const noteEl = document.getElementById("note");
+const charCount = document.getElementById("char-count");
+const saveBtn = document.getElementById("save-btn");
+const clearBtn = document.getElementById("clear-btn");
+
+const selectedDayInfo = document.getElementById("selected-day-info");
+const selectedNoteBox = document.getElementById("selected-note-box");
+
+const graphEl = document.getElementById("graph");
+const graphLabelsEl = document.getElementById("graph-labels");
+
+const helpBtn = document.getElementById("help-btn");
+const helpBackdrop = document.getElementById("help-backdrop");
+const helpClose = document.getElementById("help-close");
+
+/* ---------------------------
+   状態
+--------------------------- */
 let currentDate = new Date();
 let selectedDate = null;
+let selectedMood = null;
 
+/* ---------------------------
+   スマホ判定
+--------------------------- */
+function isMobile() {
+  return window.innerWidth < 768;
+}
+
+/* ---------------------------
+   カレンダー描画
+--------------------------- */
 function renderCalendar() {
+  calendarEl.innerHTML = "";
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  document.getElementById("current-year").textContent = year;
-  document.getElementById("current-month").textContent = month + 1;
+  monthLabel.textContent = `${year}年 ${month + 1}月`;
 
-  const grid = document.getElementById("calendar-grid");
-  grid.innerHTML = "";
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
 
-  const firstDay = new Date(year, month, 1).getDay();
-  const lastDate = new Date(year, month + 1, 0).getDate();
+  const startWeekday = firstDay.getDay();
+  const totalDays = lastDay.getDate();
 
-  // 空白セル
-  for (let i = 0; i < firstDay; i++) {
-    const empty = document.createElement("div");
-    grid.appendChild(empty);
+  const entries = loadEntries();
+  const today = new Date();
+
+  // 空白
+  for (let i = 0; i < startWeekday; i++) {
+    const blank = document.createElement("div");
+    calendarEl.appendChild(blank);
   }
 
-  // 日付セル
-  for (let d = 1; d <= lastDate; d++) {
+  // 日付
+  for (let d = 1; d <= totalDays; d++) {
     const cell = document.createElement("div");
-    cell.className = "calendar-cell";
-    cell.textContent = d;
+    cell.className = "day";
 
-    cell.addEventListener("click", () => selectDate(year, month, d));
+    const dateObj = new Date(year, month, d);
+    const key = formatDateKey(dateObj);
 
-    // 選択中の日付を強調
-    if (
-      selectedDate &&
-      selectedDate.year === year &&
-      selectedDate.month === month &&
-      selectedDate.day === d
-    ) {
-      cell.classList.add("selected");
+    // 今日
+    if (sameDay(dateObj, today)) {
+      cell.classList.add("day-today");
     }
 
-    grid.appendChild(cell);
+    // mood
+    if (entries[key]) {
+      const mood = entries[key].mood;
+      cell.classList.add(`mood-${mood}`);
+
+      const label = document.createElement("div");
+      label.className = "day-mood-label";
+      label.textContent = entries[key].label;
+      cell.appendChild(label);
+    }
+
+    const num = document.createElement("div");
+    num.className = "day-number";
+    num.textContent = d;
+    cell.appendChild(num);
+
+    // クリック
+    cell.addEventListener("click", () => onDayClick(dateObj));
+
+    calendarEl.appendChild(cell);
   }
 }
 
-function selectDate(year, month, day) {
-  selectedDate = { year, month, day };
-  document.getElementById("selected-date-label").textContent =
-    `${year} / ${month + 1} / ${day}`;
+/* ---------------------------
+   日付クリック
+--------------------------- */
+function onDayClick(dateObj) {
+  selectedDate = dateObj;
+  const key = formatDateKey(dateObj);
+  const entries = loadEntries();
+  const today = new Date();
 
-  updateDaySummary();
-  renderCalendar();
+  // 選択日表示
+  updateSelectedDayDisplay();
+
+  // 今日以外 → 編集禁止
+  if (!sameDay(dateObj, today)) {
+    return; // モーダル開かない
+  }
+
+  // 今日 → 編集可能
+  openModal();
+
+  // 既存データ
+  if (entries[key]) {
+    selectedMood = entries[key].mood;
+    noteEl.value = entries[key].note;
+    charCount.textContent = `${noteEl.value.length} / 120`;
+
+    moodButtons.forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.mood === selectedMood);
+    });
+  } else {
+    selectedMood = null;
+    noteEl.value = "";
+    charCount.textContent = "0 / 120";
+    moodButtons.forEach((btn) => btn.classList.remove("active"));
+  }
 }
 
-/* =========================================
-   気分データ保存
-========================================= */
-function saveMood() {
-  if (!selectedDate) return;
-
-  const key = `${selectedDate.year}-${selectedDate.month}-${selectedDate.day}`;
-  const mood = document.querySelector(".mood-btn.selected")?.dataset.mood || "";
-  const note = document.getElementById("mood-note-input").value;
-
-  const data = { mood, note };
-  localStorage.setItem(`mood-${key}`, JSON.stringify(data));
-
-  closeMoodModal();
-  updateDaySummary();
-}
-
-function updateDaySummary() {
-  if (!selectedDate) return;
-
-  const key = `${selectedDate.year}-${selectedDate.month}-${selectedDate.day}`;
-  const data = localStorage.getItem(`mood-${key}`);
-  const summary = document.getElementById("day-mood-summary");
-
-  if (!data) {
-    summary.textContent = "記録がありません。";
+/* ---------------------------
+   選択日表示（右側）
+--------------------------- */
+function updateSelectedDayDisplay() {
+  if (!selectedDate) {
+    selectedDayInfo.textContent = "まだ日付が選択されていません。";
+    selectedNoteBox.innerHTML = `<span class="note-empty">メモはまだありません。</span>`;
     return;
   }
 
-  const parsed = JSON.parse(data);
-  summary.textContent = `気分：${parsed.mood} / メモ：${parsed.note}`;
+  const key = formatDateKey(selectedDate);
+  const entries = loadEntries();
+
+  selectedDayInfo.textContent = `${selectedDate.getFullYear()}年 ${
+    selectedDate.getMonth() + 1
+  }月 ${selectedDate.getDate()}日`;
+
+  if (entries[key]) {
+    selectedNoteBox.textContent = entries[key].note || "（メモなし）";
+  } else {
+    selectedNoteBox.innerHTML = `<span class="note-empty">メモはまだありません。</span>`;
+  }
 }
 
-/* =========================================
-   モーダル開閉
-========================================= */
-function openMoodModal() {
-  document.getElementById("mood-modal-backdrop").classList.remove("hidden");
+/* ---------------------------
+   モーダル
+--------------------------- */
+function openModal() {
+  modalBackdrop.classList.add("show");
 }
 
-function closeMoodModal() {
-  document.getElementById("mood-modal-backdrop").classList.add("hidden");
+function closeModal() {
+  modalBackdrop.classList.remove("show");
 }
 
-/* =========================================
-   嫌なことを宇宙に飛ばす演出
-========================================= */
-function launchNegative() {
-  const text = document.getElementById("negative-note-input").value;
-  if (!text) return;
-
-  const layer = document.getElementById("negative-launch-layer");
-  const card = document.getElementById("negative-card-visual");
-
-  card.textContent = text;
-  layer.classList.remove("hidden");
-
-  setTimeout(() => {
-    layer.classList.add("hidden");
-    document.getElementById("negative-note-input").value = "";
-  }, 2000);
-}
-
-/* =========================================
-   タスク管理
-========================================= */
-function addTask() {
-  const input = document.getElementById("new-task-input");
-  const text = input.value.trim();
-  if (!text) return;
-
-  const list = document.getElementById("task-list");
-
-  const li = document.createElement("li");
-  li.className = "task-item";
-  li.textContent = text;
-
-  li.addEventListener("click", () => li.remove());
-
-  list.appendChild(li);
-  input.value = "";
-}
-
-/* =========================================
-   天気（ダミーAPI）
-========================================= */
-function loadWeather() {
-  document.getElementById("weather-main").textContent = "晴れ";
-  document.getElementById("weather-temp").textContent = "18℃";
-  document.getElementById("weather-comment").textContent =
-    "明日は気持ちよく過ごせそうだよ。";
-}
-
-/* =========================================
-   イベント登録
-========================================= */
-function initEvents() {
-  document.getElementById("prev-month-btn").addEventListener("click", () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    renderCalendar();
-  });
-
-  document.getElementById("next-month-btn").addEventListener("click", () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar();
-  });
-
-  document.getElementById("today-btn").addEventListener("click", () => {
-    currentDate = new Date();
-    renderCalendar();
-  });
-
-  document.getElementById("open-mood-modal-btn").addEventListener("click", openMoodModal);
-  document.getElementById("close-mood-modal-btn").addEventListener("click", closeMoodModal);
-  document.getElementById("save-mood-btn").addEventListener("click", saveMood);
-
-  document.getElementById("launch-negative-btn").addEventListener("click", launchNegative);
-
-  document.getElementById("add-task-btn").addEventListener("click", addTask);
-  document.getElementById("new-task-input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") addTask();
-  });
-
-  document.getElementById("open-settings-btn").addEventListener("click", () => {
-    document.getElementById("settings-backdrop").classList.remove("hidden");
-  });
-
-  document.getElementById("close-settings-btn").addEventListener("click", () => {
-    document.getElementById("settings-backdrop").classList.add("hidden");
-  });
-
-  // 気分ボタンの選択
-  document.querySelectorAll(".mood-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".mood-btn").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-    });
-  });
-}
-
-/* =========================================
-   初期化
-========================================= */
-document.addEventListener("DOMContentLoaded", () => {
-  renderCalendar();
-  loadWeather();
-  initEvents();
+modalClose.addEventListener("click", closeModal);
+modalBackdrop.addEventListener("click", (e) => {
+  if (e.target === modalBackdrop) closeModal();
 });
 
-  <script src="js/theme.js"></script>
-  <script src="js/app.js"></script>
+/* ---------------------------
+   気分ボタン
+--------------------------- */
+moodButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    moodButtons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedMood = btn.dataset.mood;
+  });
+});
+
+/* ---------------------------
+   メモ文字数
+--------------------------- */
+noteEl.addEventListener("input", () => {
+  charCount.textContent = `${noteEl.value.length} / 120`;
+});
+
+/* ---------------------------
+   保存
+--------------------------- */
+saveBtn.addEventListener("click", () => {
+  if (!selectedDate || !selectedMood) return;
+
+  const key = formatDateKey(selectedDate);
+  const entries = loadEntries();
+
+  const moodLabels = {
+    bad: "しんどい",
+    meh: "ふつう",
+    good: "わりと良い",
+    great: "最高",
+  };
+
+  entries[key] = {
+    mood: selectedMood,
+    label: moodLabels[selectedMood],
+    note: noteEl.value,
+    createdAt: new Date().toISOString(),
+  };
+
+  saveEntries(entries);
+  closeModal();
+  renderCalendar();
+  updateSelectedDayDisplay();
+});
+
+/* ---------------------------
+   クリア
+--------------------------- */
+clearBtn.addEventListener("click", () => {
+  noteEl.value = "";
+  charCount.textContent = "0 / 120";
+});
+
+/* ---------------------------
+   月移動
+--------------------------- */
+document.getElementById("prev-month").addEventListener("click", () => {
+  currentDate.setMonth(currentDate.getMonth() - 1);
+  renderCalendar();
+});
+
+document.getElementById("next-month").addEventListener("click", () => {
+  currentDate.setMonth(currentDate.getMonth() + 1);
+  renderCalendar();
+});
+
+/* ---------------------------
+   使い方モーダル
+--------------------------- */
+helpBtn.addEventListener("click", () => {
+  helpBackdrop.classList.add("show");
+});
+
+helpClose.addEventListener("click", () => {
+  helpBackdrop.classList.remove("show");
+});
+
+helpBackdrop.addEventListener("click", (e) => {
+  if (e.target === helpBackdrop) helpBackdrop.classList.remove("show");
+});
+
+/* ---------------------------
+   グラフ描画
+--------------------------- */
+function renderGraph() {
+  const entries = loadEntries();
+  const today = new Date();
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    days.push(d);
+  }
+
+  graphEl.innerHTML = "";
+  graphLabelsEl.innerHTML = "";
+
+  days.forEach((d) => {
+    const key = formatDateKey(d);
+    const bar = document.createElement("div");
+    bar.className = "graph-bar";
+
+    const inner = document.createElement("div");
+    inner.className = "graph-bar-inner";
+
+    if (entries[key]) {
+      const moodScore = { bad: 1, meh: 2, good: 3, great: 4 }[
+        entries[key].mood
+      ];
+      inner.style.setProperty("--bar-height", `${(moodScore / 4) * 100}%`);
+    } else {
+      inner.style.setProperty("--bar-height", "0%");
+    }
+
+    bar.appendChild(inner);
+    graphEl.appendChild(bar);
+
+    const label = document.createElement("div");
+    label.textContent = d.getDate();
+    graphLabelsEl.appendChild(label);
+  });
+}
+
+/* ---------------------------
+   初期化
+--------------------------- */
+function init() {
+  const today = new Date();
+  todayLabel.textContent = `${today.getMonth() + 1}月${today.getDate()}日`;
+
+  renderCalendar();
+  renderGraph();
+}
+
+init();
+
+  </script>
+
 </body>
 </html>
