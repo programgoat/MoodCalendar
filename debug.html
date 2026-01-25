@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Debug Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .test { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+    .error { background: #ffe0e0; color: red; }
+    .success { background: #e0ffe0; color: green; }
+  </style>
+</head>
+<body>
+  <h1>デバッグテスト</h1>
+  
+  <div class="test">
+    <h3>1. JavaScript動作確認</h3>
+    <button onclick="testJS()">テスト実行</button>
+    <div id="js-result"></div>
+  </div>
+  
+  <div class="test">
+    <h3>2. CSS読み込み確認</h3>
+    <div class="test-css">この文字が灰色の背景ならCSSが読み込めています</div>
+  </div>
+  
+  <script>
+    function testJS() {
+      const result = document.getElementById('js-result');
+      try {
+        // localStorageテスト
+        localStorage.setItem('test', 'ok');
+        const data = localStorage.getItem('test');
+        
+        result.innerHTML = '<span class="success">✓ JavaScriptとlocalStorageは正常です</span>';
+      } catch (e) {
+        result.innerHTML = '<span class="error">✗ エラー: ' + e.message + '</span>';
+      }
+    }
+    
+    // ページ読み込み時に実行
+    window.onload = function() {
+      console.log('デバッグページが読み込まれました');
+    };
+  </script>
+</body>
+</html>

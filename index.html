@@ -8,6 +8,7 @@
 </head>
 <body>
 
+  <div id="content-area">
   <div class="app">
     <div class="app-inner">
 
@@ -146,6 +147,160 @@
     </div>
   </div>
 
+  <!-- 記録ページ -->
+  <div id="record-page" class="page-content" style="display: none;">
+    <div class="app">
+      <div class="app-inner">
+        <header class="header">
+          <div class="title-block">
+            <div class="logo">📝</div>
+            <div>
+              <div class="title-text-main">記録</div>
+              <div class="title-text-sub">今日の気分と出来事を記録しましょう</div>
+            </div>
+          </div>
+        </header>
+        
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">今日の記録</div>
+              <div class="card-subtitle">気分と出来事を記録できます</div>
+            </div>
+          </div>
+          
+          <div class="mood-scale" id="record-mood-scale">
+            <button class="mood-option" data-mood="bad"><span>😣</span><strong>しんどい</strong></button>
+            <button class="mood-option" data-mood="meh"><span>😐</span><strong>ふつう</strong></button>
+            <button class="mood-option" data-mood="good"><span>🙂</span><strong>わりと良い</strong></button>
+            <button class="mood-option" data-mood="great"><span>😄</span><strong>最高</strong></button>
+          </div>
+          
+          <div class="textarea-label">
+            <span>今日の出来事</span>
+            <span id="record-char-count">0 / 200</span>
+          </div>
+          <textarea id="record-note" placeholder="今日の出来事を記録してください..." maxlength="200"></textarea>
+          
+          <button class="btn-primary" id="record-save-btn"><span>➤</span>記録を保存</button>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- 占いページ -->
+  <div id="fortune-page" class="page-content" style="display: none;">
+    <div class="app">
+      <div class="app-inner">
+        <header class="header">
+          <div class="title-block">
+            <div class="logo">🔮</div>
+            <div>
+              <div class="title-text-main">占い</div>
+              <div class="title-text-sub">今日の運勢をチェックしましょう</div>
+            </div>
+          </div>
+        </header>
+        
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">今日の運勢</div>
+              <div class="card-subtitle">ランキングが表示されます</div>
+            </div>
+          </div>
+          
+          <div id="ranking-container"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- 実績ページ -->
+  <div id="achievement-page" class="page-content" style="display: none;">
+    <div class="app">
+      <div class="app-inner">
+        <header class="header">
+          <div class="title-block">
+            <div class="logo">🏆</div>
+            <div>
+              <div class="title-text-main">実績</div>
+              <div class="title-text-sub">記録の実績を確認しましょう</div>
+            </div>
+          </div>
+        </header>
+        
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">実績一覧</div>
+              <div class="card-subtitle">達成した実績が表示されます</div>
+            </div>
+          </div>
+          
+          <div class="achievement-list">
+            <div class="achievement-item">
+              <div class="achievement-icon">🌟</div>
+              <div class="achievement-info">
+                <div class="achievement-title">初めての記録</div>
+                <div class="achievement-desc">最初の気分を記録する</div>
+              </div>
+            </div>
+            <div class="achievement-item locked">
+              <div class="achievement-icon">🔒</div>
+              <div class="achievement-info">
+                <div class="achievement-title">7日連続記録</div>
+                <div class="achievement-desc">7日間毎日記録する</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- 設定ページ -->
+  <div id="settings-page" class="page-content" style="display: none;">
+    <div class="app">
+      <div class="app-inner">
+        <header class="header">
+          <div class="title-block">
+            <div class="logo">⚙️</div>
+            <div>
+              <div class="title-text-main">設定</div>
+              <div class="title-text-sub">アプリの設定を変更しましょう</div>
+            </div>
+          </div>
+        </header>
+        
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">設定</div>
+              <div class="card-subtitle">各種設定を変更できます</div>
+            </div>
+          </div>
+          
+          <div class="settings-list">
+            <div class="setting-item">
+              <div class="setting-label">テーマ</div>
+              <button class="setting-btn" id="settings-theme-btn">変更</button>
+            </div>
+            <div class="setting-item">
+              <div class="setting-label">データのエクスポート</div>
+              <button class="setting-btn" id="export-btn">エクスポート</button>
+            </div>
+            <div class="setting-item">
+              <div class="setting-label">データの削除</div>
+              <button class="setting-btn danger" id="clear-data-btn">削除</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  </div>
+
   <!-- ▼▼▼ モーダル：気分入力 ▼▼▼ -->
   <div class="modal-backdrop" id="modal-backdrop">
     <div class="modal">
@@ -238,6 +393,26 @@
 
   <!-- エフェクト用コンテナ -->
   <div id="effect-container"></div>
+
+  <!-- ナビゲーションバー -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-page="calendar">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">記録</span>
+    </button>
+    <button class="nav-btn" data-page="fortune">
+      <span class="nav-icon">🔮</span>
+      <span class="nav-label">占い</span>
+    </button>
+    <button class="nav-btn" data-page="achievement">
+      <span class="nav-icon">🏆</span>
+      <span class="nav-label">実績</span>
+    </button>
+    <button class="nav-btn" data-page="settings">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">設定</span>
+    </button>
+  </nav>
 
   <script src="script.js"></script>
 </body>

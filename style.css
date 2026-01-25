@@ -37,6 +37,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  padding-bottom: 100px;
 }
 
 @media (max-width: 600px) {
@@ -1897,4 +1898,201 @@ body[data-theme="crystal"] .card {
 /* Ruin テーマ：古い石の質感 */
 body[data-theme="ruin"] .app {
   border: 1px solid rgba(212, 165, 116, 0.25);
+}
+
+/* ===========================
+   ナビゲーションバー
+=========================== */
+
+#content-area {
+  width: 100%;
+  max-width: 1120px;
+  position: relative;
+}
+
+.page-content {
+  display: none;
+}
+
+.page-content.active {
+  display: block;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-md);
+  min-width: 60px;
+}
+
+.nav-btn:hover {
+  color: var(--text-main);
+  background: var(--accent-soft);
+}
+
+.nav-btn.active {
+  color: var(--accent);
+}
+
+.nav-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.nav-label {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .nav-btn {
+    padding: 6px 12px;
+    min-width: 50px;
+  }
+  
+  .nav-icon {
+    font-size: 18px;
+  }
+  
+  .nav-label {
+    font-size: 10px;
+  }
+}
+
+/* ===========================
+   ページコンテンツ
+=========================== */
+
+.achievement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.achievement-item:hover {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.achievement-item.locked {
+  opacity: 0.6;
+}
+
+.achievement-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  border-radius: var(--radius-md);
+}
+
+.achievement-info {
+  flex: 1;
+}
+
+.achievement-title {
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.achievement-desc {
+  font-size: 14px;
+  color: var(--text-sub);
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.setting-label {
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.setting-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.5);
+  color: var(--text-main);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 14px;
+}
+
+.setting-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.setting-btn.danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.setting-btn.danger:hover {
+  background: rgba(249, 115, 115, 0.1);
+}
+
+#ranking-container {
+  min-height: 200px;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sub);
+  font-style: italic;
 }

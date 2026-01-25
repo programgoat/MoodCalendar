@@ -1,10 +1,158 @@
 /* ===========================
    MoodCalendar v3 — JavaScript
    ・今日だけ編集可能
-   ・翌日以降は閲覧のみ
    ・スマホ/PC UI判定
    ・ポップなアニメーション制御
 =========================== */
+
+/* ---------------------------
+   ナビゲーション機能
+--------------------------- */
+function initNavigation() {
+  const navButtons = document.querySelectorAll('.nav-btn');
+  const pageContents = document.querySelectorAll('.page-content');
+  
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetPage = btn.dataset.page;
+      
+      // Update active button
+      navButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Show/hide pages
+      pageContents.forEach(page => {
+        page.style.display = 'none';
+      });
+      
+      if (targetPage === 'calendar') {
+        // Show the original calendar content (first .app)
+        document.querySelector('#content-area > .app').style.display = 'block';
+      } else {
+        // Hide the original calendar content
+        document.querySelector('#content-area > .app').style.display = 'none';
+        
+        // Show the target page
+        const targetElement = document.getElementById(`${targetPage}-page`);
+        if (targetElement) {
+          targetElement.style.display = 'block';
+        }
+      }
+    });
+  });
+}
+
+/* ---------------------------
+   記録ページ機能
+--------------------------- */
+function initRecordPage() {
+  const recordMoodButtons = document.querySelectorAll('#record-mood-scale .mood-option');
+  const recordNote = document.getElementById('record-note');
+  const recordCharCount = document.getElementById('record-char-count');
+  const recordSaveBtn = document.getElementById('record-save-btn');
+  
+  let selectedRecordMood = null;
+  
+  // 気分ボタン
+  recordMoodButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      recordMoodButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedRecordMood = btn.dataset.mood;
+    });
+  });
+  
+  // 文字数カウント
+  if (recordNote && recordCharCount) {
+    recordNote.addEventListener('input', () => {
+      recordCharCount.textContent = `${recordNote.value.length} / 200`;
+    });
+  }
+  
+  // 保存ボタン
+  if (recordSaveBtn) {
+    recordSaveBtn.addEventListener('click', () => {
+      if (!selectedRecordMood) {
+        alert('気分を選択してください');
+        return;
+      }
+      
+      const today = new Date();
+      const key = formatDateKey(today);
+      const entries = loadEntries();
+      
+      const moodLabels = {
+        bad: "しんどい",
+        meh: "ふつう",
+        good: "わりと良い",
+        great: "最高",
+      };
+      
+      entries[key] = {
+        mood: selectedRecordMood,
+        label: moodLabels[selectedRecordMood],
+        note: recordNote.value,
+        createdAt: new Date().toISOString(),
+      };
+      
+      saveEntries(entries);
+      
+      // リセット
+      recordMoodButtons.forEach(b => b.classList.remove('active'));
+      recordNote.value = '';
+      recordCharCount.textContent = '0 / 200';
+      selectedRecordMood = null;
+      
+      alert('記録を保存しました！');
+    });
+  }
+}
+
+/* ---------------------------
+   設定ページ機能
+--------------------------- */
+function initSettingsPage() {
+  const settingsThemeBtn = document.getElementById('settings-theme-btn');
+  const exportBtn = document.getElementById('export-btn');
+  const clearDataBtn = document.getElementById('clear-data-btn');
+  
+  // テーマ変更ボタン
+  if (settingsThemeBtn) {
+    settingsThemeBtn.addEventListener('click', () => {
+      const themeBtn = document.getElementById('theme-btn');
+      if (themeBtn) {
+        themeBtn.click();
+      }
+    });
+  }
+  
+  // エクスポートボタン
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const entries = loadEntries();
+      const dataStr = JSON.stringify(entries, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `mood-calendar-backup-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+  
+  // データ削除ボタン
+  if (clearDataBtn) {
+    clearDataBtn.addEventListener('click', () => {
+      if (confirm('本当にすべてのデータを削除しますか？この操作は元に戻せません。')) {
+        localStorage.removeItem('moodEntries');
+        alert('すべてのデータを削除しました');
+        renderCalendar();
+        updateSelectedDayDisplay();
+      }
+    });
+  }
+}
 
 /* ---------------------------
    日付フォーマット
@@ -353,6 +501,9 @@ function init() {
   todayLabel.textContent = `${today.getMonth() + 1}月${today.getDate()}日`;
 
   renderCalendar();
+  initNavigation();
+  initRecordPage();
+  initSettingsPage();
 }
 
 /* ---------------------------
