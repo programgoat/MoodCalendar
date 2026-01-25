@@ -496,6 +496,121 @@ function renderGraph() {
 /* ---------------------------
    初期化
 --------------------------- */
+function initFortunePage() {
+  loadFortuneData();
+}
+
+async function loadFortuneData() {
+  const rankingContainer = document.getElementById('ranking-container');
+  
+  try {
+    const response = await fetch('fortune.json');
+    const fortuneData = await response.json();
+    
+    displayFortuneRanking(fortuneData, rankingContainer);
+  } catch (error) {
+    console.error('占いデータの読み込みに失敗しました:', error);
+    displayError(rankingContainer);
+  }
+}
+
+function displayFortuneRanking(fortuneData, container) {
+  console.log('Sorted signs:', Object.entries(fortuneData).sort(([,a], [,b]) => a.rank - b.rank));
+  
+  // 星座を順位でソート
+  const sortedSigns = Object.entries(fortuneData)
+    .sort(([,a], [,b]) => a.rank - b.rank);
+  
+  console.log('Sorted signs:', sortedSigns);
+  
+  container.innerHTML = '';
+  
+  sortedSigns.forEach(([sign, data], index) => {
+    console.log(`Processing ${sign}, rank ${data.rank}`);
+    const rankElement = document.createElement('div');
+    rankElement.className = 'fortune-rank-item';
+    rankElement.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    `;
+    
+    // 順位に応じたスタイル
+    const rankColors = {
+      1: '#ffd700', // 金
+      2: '#c0c0c0', // 銀
+      3: '#cd7f32'  // 銅
+    };
+    
+    const rankEmoji = {
+      1: '🥇',
+      2: '🥈', 
+      3: '🥉'
+    };
+    
+    rankElement.innerHTML = `
+      <div style="
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: ${rankColors[data.rank] ? rankColors[data.rank] + '20' : 'rgba(56, 189, 248, 0.15)'};
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: ${data.rank <= 3 ? '20px' : '16px'};
+        color: ${rankColors[data.rank] || 'var(--accent)'};
+      ">
+        ${rankEmoji[data.rank] || data.rank}
+      </div>
+      <div style="flex: 1;">
+        <div style="font-weight: 600; color: var(--text-main); margin-bottom: 4px;">
+          ${sign}
+        </div>
+        <div style="font-size: 14px; color: var(--text-sub); line-height: 1.4;">
+          ${data.text}
+        </div>
+        <div style="font-size: 12px; color: var(--accent); margin-top: 4px;">
+          🔮 ラッキーアイテム: ${data.lucky}
+        </div>
+      </div>
+    `;
+    
+    // ホバー効果
+    rankElement.addEventListener('mouseenter', () => {
+      rankElement.style.background = 'rgba(56, 189, 248, 0.1)';
+      rankElement.style.borderColor = 'var(--accent)';
+    });
+    
+    rankElement.addEventListener('mouseleave', () => {
+      rankElement.style.background = 'rgba(15, 23, 42, 0.3)';
+      rankElement.style.borderColor = 'var(--border)';
+    });
+    
+    container.appendChild(rankElement);
+  });
+}
+
+function displayError(container) {
+  container.innerHTML = `
+    <div style="
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-sub);
+    ">
+      <div style="font-size: 48px; margin-bottom: 16px;">🔮</div>
+      <div style="font-weight: 600; margin-bottom: 8px;">占いデータの読み込みに失敗しました</div>
+      <div style="font-size: 14px;">後でもう一度お試しください</div>
+    </div>
+  `;
+}
+
 function init() {
   const today = new Date();
   todayLabel.textContent = `${today.getMonth() + 1}月${today.getDate()}日`;
@@ -504,6 +619,7 @@ function init() {
   initNavigation();
   initRecordPage();
   initSettingsPage();
+  initFortunePage();
 }
 
 /* ---------------------------
