@@ -536,18 +536,38 @@ function displayFortuneRanking(fortuneData, container) {
     // 順位に応じたクラス
     const rankClass = data.rank <= 3 ? `rank-${data.rank}` : '';
     
+    // テキストを短く切り取る（プレビュー用）
+    const previewText = data.text.length > 60 ? data.text.substring(0, 60) + '...' : data.text;
+    
     rankElement.innerHTML = `
       <div class="fortune-rank-number ${rankClass}">
         ${data.rank === 1 ? '🥇' : data.rank === 2 ? '🥈' : data.rank === 3 ? '🥉' : data.rank}
       </div>
       <div class="fortune-rank-content">
         <div class="fortune-rank-sign">${sign}</div>
+        <div class="fortune-rank-preview">${previewText}</div>
         <div class="fortune-rank-text">${data.text}</div>
         <div class="fortune-rank-lucky">
           🔮 ラッキーアイテム: ${data.lucky}
         </div>
+        <div class="fortune-rank-expand">
+          クリックして詳細を見る →
+        </div>
       </div>
     `;
+    
+    // クリックイベントを追加
+    rankElement.addEventListener('click', () => {
+      // 他のすべてのアイテムを閉じる
+      document.querySelectorAll('.fortune-rank-item').forEach(item => {
+        if (item !== rankElement) {
+          item.classList.remove('expanded');
+        }
+      });
+      
+      // 現在のアイテムをトグル
+      rankElement.classList.toggle('expanded');
+    });
     
     container.appendChild(rankElement);
   });
