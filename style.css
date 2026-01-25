@@ -1926,8 +1926,6 @@ body[data-theme="ruin"] .app {
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
   cursor: pointer;
-  writing-mode: horizontal-tb;
-  text-orientation: mixed;
 }
 
 .fortune-rank-item:hover {
