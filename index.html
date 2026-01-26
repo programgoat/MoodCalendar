@@ -1,10 +1,56 @@
 \<!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" style="writing-mode: horizontal-tb !important; text-orientation: mixed !important; direction: ltr !important;">
 <head>
   <meta charset="UTF-8">
   <title>Mood Calendar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      writing-mode: horizontal-tb !important;
+      text-orientation: mixed !important;
+      direction: ltr !important;
+    }
+    
+    * {
+      writing-mode: horizontal-tb !important;
+      text-orientation: mixed !important;
+      direction: ltr !important;
+    }
+    
+    .fortune-rank-item,
+    .fortune-rank-content,
+    .fortune-rank-sign,
+    .fortune-rank-preview,
+    .fortune-rank-text,
+    .fortune-rank-lucky,
+    .fortune-rank-expand {
+      writing-mode: horizontal-tb !important;
+      text-orientation: mixed !important;
+      direction: ltr !important;
+      display: block !important;
+    }
+  </style>
+  <script>
+    // 強制的に横書きにするJavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+      const allElements = document.querySelectorAll('*');
+      allElements.forEach(el => {
+        el.style.writingMode = 'horizontal-tb';
+        el.style.textOrientation = 'mixed';
+        el.style.direction = 'ltr';
+      });
+      
+      // 特に占い要素を強制
+      const fortuneElements = document.querySelectorAll('.fortune-rank-item, .fortune-rank-content, .fortune-rank-sign, .fortune-rank-preview, .fortune-rank-text, .fortune-rank-lucky, .fortune-rank-expand');
+      fortuneElements.forEach(el => {
+        el.style.writingMode = 'horizontal-tb';
+        el.style.textOrientation = 'mixed';
+        el.style.direction = 'ltr';
+        el.style.display = 'block';
+      });
+    });
+  </script>
 </head>
 <body>
 

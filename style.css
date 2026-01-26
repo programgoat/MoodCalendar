@@ -1915,82 +1915,105 @@ body[data-theme="ruin"] .app {
    占いランキング
 =========================== */
 
+#ranking-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.fortune-rank-item,
+.fortune-rank-item > div {
+  writing-mode: horizontal-tb !important;
+}
+
 .fortune-rank-item {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  background: rgba(15, 23, 42, 0.6);
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.8);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .fortune-rank-item:hover {
-  background: rgba(56, 189, 248, 0.1);
+  background: rgba(56, 189, 248, 0.15);
   border-color: var(--accent);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(56, 189, 248, 0.2);
 }
 
 .fortune-rank-item.expanded {
-  background: rgba(56, 189, 248, 0.15);
+  background: rgba(56, 189, 248, 0.2);
   border-color: var(--accent);
+  grid-column: span 2;
 }
 
 .fortune-rank-number {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(56, 189, 248, 0.15);
+  background: rgba(56, 189, 248, 0.2);
   border-radius: 50%;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--accent);
 }
 
 .fortune-rank-number.rank-1 {
-  background: rgba(255, 215, 0, 0.2);
+  background: rgba(255, 215, 0, 0.25);
   color: #ffd700;
-  font-size: 20px;
+  font-size: 16px;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 .fortune-rank-number.rank-2 {
-  background: rgba(192, 192, 192, 0.2);
+  background: rgba(192, 192, 192, 0.25);
   color: #c0c0c0;
-  font-size: 20px;
+  font-size: 16px;
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.3);
 }
 
 .fortune-rank-number.rank-3 {
-  background: rgba(205, 127, 50, 0.2);
+  background: rgba(205, 127, 50, 0.25);
   color: #cd7f32;
-  font-size: 20px;
+  font-size: 16px;
+  box-shadow: 0 0 15px rgba(205, 127, 50, 0.3);
 }
 
 .fortune-rank-content {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .fortune-rank-sign {
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 6px;
-  font-size: 16px;
+  margin-bottom: 12px;
+  font-size: 18px;
 }
 
 .fortune-rank-preview {
   font-size: 14px;
   color: var(--text-sub);
-  line-height: 1.5;
-  margin-bottom: 8px;
+  line-height: 1.6;
+  margin-bottom: 12px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1998,8 +2021,8 @@ body[data-theme="ruin"] .app {
 .fortune-rank-text {
   font-size: 14px;
   color: var(--text-sub);
-  line-height: 1.5;
-  margin-bottom: 8px;
+  line-height: 1.6;
+  margin-bottom: 12px;
   display: none;
 }
 
@@ -2012,12 +2035,16 @@ body[data-theme="ruin"] .app {
 }
 
 .fortune-rank-lucky {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--accent);
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 8px;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: rgba(56, 189, 248, 0.1);
+  border-radius: var(--radius-md);
 }
 
 .fortune-rank-expand {
@@ -2026,11 +2053,24 @@ body[data-theme="ruin"] .app {
   opacity: 0.8;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
+  font-weight: 500;
 }
 
 .fortune-rank-item.expanded .fortune-rank-expand {
   display: none;
+}
+
+@media (max-width: 600px) {
+  #ranking-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .fortune-rank-item.expanded {
+    grid-column: span 1;
+  }
 }
 
 /* ===========================
@@ -2219,6 +2259,7 @@ body[data-theme="ruin"] .app {
 
 .setting-btn.danger:hover {
   background: rgba(249, 115, 115, 0.1);
+  color: #fff;
 }
 
 #ranking-container {

@@ -543,14 +543,14 @@ function displayFortuneRanking(fortuneData, container) {
       <div class="fortune-rank-number ${rankClass}">
         ${data.rank === 1 ? '🥇' : data.rank === 2 ? '🥈' : data.rank === 3 ? '🥉' : data.rank}
       </div>
-      <div class="fortune-rank-content">
-        <div class="fortune-rank-sign">${sign}</div>
-        <div class="fortune-rank-preview">${previewText}</div>
-        <div class="fortune-rank-text">${data.text}</div>
-        <div class="fortune-rank-lucky">
+      <div class="fortune-rank-content" style="display: block; writing-mode: horizontal-tb; width: 100%; min-width: 250px;">
+        <div class="fortune-rank-sign" style="display: block; writing-mode: horizontal-tb; width: 100%;">${sign}</div>
+        <div class="fortune-rank-preview" style="display: block; writing-mode: horizontal-tb; width: 100%; min-width: 200px; padding: 8px; box-sizing: border-box;">${previewText}</div>
+        <div class="fortune-rank-text" style="display: none; writing-mode: horizontal-tb; width: 100%;">${data.text}</div>
+        <div class="fortune-rank-lucky" style="display: block; writing-mode: horizontal-tb; width: 100%; min-width: 200px;">
           🔮 ラッキーアイテム: ${data.lucky}
         </div>
-        <div class="fortune-rank-expand">
+        <div class="fortune-rank-expand" style="display: block; writing-mode: horizontal-tb; width: 100%;">
           クリックして詳細を見る →
         </div>
       </div>
