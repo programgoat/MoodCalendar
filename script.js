@@ -523,6 +523,7 @@ function displayFortuneRanking(fortuneData, container) {
     .sort(([,a], [,b]) => a.rank - b.rank);
   
   console.log('Sorted signs:', sortedSigns);
+  console.log('All ranks:', sortedSigns.map(([sign, data]) => `${sign}: ${data.rank}`));
   
   container.innerHTML = '';
   container.style.cssText = '';
@@ -558,6 +559,8 @@ function displayFortuneRanking(fortuneData, container) {
     
     // クリックイベントを追加
     rankElement.addEventListener('click', () => {
+      console.log(`Clicked on ${sign}, current expanded state:`, rankElement.classList.contains('expanded'));
+      
       // 他のすべてのアイテムを閉じる
       document.querySelectorAll('.fortune-rank-item').forEach(item => {
         if (item !== rankElement) {
@@ -567,10 +570,16 @@ function displayFortuneRanking(fortuneData, container) {
       
       // 現在のアイテムをトグル
       rankElement.classList.toggle('expanded');
+      
+      // 展開状態をログ
+      console.log(`After toggle, expanded state:`, rankElement.classList.contains('expanded'));
     });
     
     container.appendChild(rankElement);
+    console.log(`Appended ${sign} to container`);
   });
+  
+  console.log('Total items in container:', container.children.length);
 }
 
 function displayError(container) {
